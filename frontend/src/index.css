@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tambahkan kode ini di akhir file src/index.css Anda */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.image-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+/* Menambahkan gaya untuk scrollbar */
+
+/* Untuk browser berbasis Webkit (Chrome, Safari, Edge, dll.) */
+::-webkit-scrollbar {
+  width: 10px; /* Lebar scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Membuat jalur scrollbar tidak terlihat */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* Warna terang untuk pegangan scrollbar */
+  border-radius: 10px; /* Membuat sudut membulat */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af; /* Warna menjadi sedikit lebih gelap saat disentuh mouse */
+}
+
+/* Untuk Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent; /* Warna pegangan dan jalur */
+}
+
+/* Menghilangkan scrollbar untuk galeri */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Untuk Firefox dan IE/Edge */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
