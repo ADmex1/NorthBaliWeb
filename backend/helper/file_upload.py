@@ -8,4 +8,6 @@ def file_upload(required_fields):
         if not field_value:
             err_message = jsonify({"Error": f"missing required field:{field}"})
             raise BadRequest(response = err_message)
+        data[field] - field_value
+    return data
         

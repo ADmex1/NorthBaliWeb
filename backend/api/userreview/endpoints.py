@@ -2,10 +2,11 @@ import os
 from flask import Blueprint, jsonify, request
 from  database.database import get_connection
 import mysql.connector
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from flasgger import swag_from
 from api.auth.endpoints import token_required
-
+from helper.file_upload import file_upload
 userreview_endpoints = Blueprint('userreview_endpoints', __name__)
 
 
@@ -15,8 +16,8 @@ def default_date_handler(obj):
     raise TypeError("Type Not Serialazble")
 
 @userreview_endpoints.route('/all-reviews', methods=['GET'])
-@token_required
-def all_reviews(current_user):
+
+def all_reviews():
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -32,4 +33,9 @@ def all_reviews(current_user):
 @token_required
 def upload_review(current_user):
     try:
-        required = 
+        required =  upload_review(["content,rating, spot_id"])
+
+        if 'file' not in request.files or request.files['file'].filename == '':
+            return jsonify({"Error" : "No file part in the request"}),400 
+        file = request.files['file']
+        filename = secure_filename(file.filename)
