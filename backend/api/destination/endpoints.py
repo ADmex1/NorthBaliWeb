@@ -107,3 +107,77 @@ def upload_destination(current_user):
 
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
+    
+#Update
+@destination_endpoints.route('/update/<int:destination_id>', methods=['PUT'])
+@token_required
+@admin_required
+def update_destination(current_user, destination_id):
+    try:
+        data = request.get_json()
+
+        required_fields = ["name", "location", "category", "description", "image", "rating", "bestTime", "highlights"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"{-} Error": f"{field} is required"}), 400
+
+        name = data["name"]
+        location = data["location"]
+        category = data["category"]
+        description = data["description"]
+        image_urls = json.dumps(data["image"])  
+        rating = float(data["rating"])
+        highlights = json.dumps(data.get("highlights", []))  
+        best_time_range = data.get("bestTime", "")
+        gmaps_url = data.get("gmapsUrl", "")
+        youtube_link = f"https://www.youtube.com/watch?v={data.get('youtubeId')}" if data.get("youtubeId") else None
+
+        best_time_range = best_time_range.replace("WITA", "").strip()
+        try:
+            best_time_start, best_time_end = best_time_range.split(" - ")
+            best_time_start = best_time_start.strip()
+            best_time_end = best_time_end.strip()
+        except ValueError:
+            return jsonify({"{-} Error": "bestTime format must be 'HH:MM - HH:MM [WITA]'"})
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = """
+            UPDATE destination SET
+                name = %s,
+                location = %s,
+                category = %s,
+                description = %s,
+                image = %s,
+                rating = %s,
+                highlights = %s,
+                best_time_start = %s,
+                best_time_end = %s,
+                gmaps_url = %s,
+                youtube_link = %s,
+                admin_id = %s
+            WHERE id = %s
+        """
+        cursor.execute(query, (
+            name,
+            location,
+            category,
+            description,
+            image_urls,
+            rating,
+            highlights,
+            best_time_start,
+            best_time_end,
+            gmaps_url,
+            youtube_link,
+            current_user['id'],
+            destination_id
+        ))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"{+} Success": "Destination updated successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"{-} Error": str(e)}), 500
