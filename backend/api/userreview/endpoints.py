@@ -25,17 +25,18 @@ def all_reviews():
         reviews = cursor.fetchall()
         cursor.close()
         conn.close()
-        return jsonify({"Message": reviews}),200
+        return jsonify({"User Review Datas": reviews}),200
     except mysql.connector.Error as e:
         return jsonify({"Error": str(e)}),500
     
-@userreview_endpoints.route('/upload', methods=['POST'])
-@token_required
-def upload_review(current_user):
-    try:
-        required =  upload_review(["content,rating, spot_id"])
+# @userreview_endpoints.route('/upload', methods=['POST'])
+# @token_required
+# def upload_review(current_user):
+#     try:
+#         required =  upload_review(["content,rating, spot_id"])
 
-        if 'file' not in request.files or request.files['file'].filename == '':
-            return jsonify({"Error" : "No file part in the request"}),400 
-        file = request.files['file']
-        filename = secure_filename(file.filename)
+#         if 'file' not in request.files or request.files['file'].filename == '':
+#             return jsonify({"Error" : "No file part in the request"}),400 
+#         file = request.files['file']
+#         filename = secure_filename(file.filename)
+#         fi
