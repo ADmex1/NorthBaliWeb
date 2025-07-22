@@ -44,6 +44,36 @@ def destination_list():
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500
     
+@destination_endpoints.route('/<int:destination_id>', methods=['GET'])
+def get_destination_by_id(destination_id):
+    try: 
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM destination WHERE id = %s", (destination_id,))
+        destinations = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        for dest in destinations:
+            for key in ['best_time_start', 'best_time_end']:
+                if isinstance(dest.get(key), timedelta):
+                    total_seconds = int(dest[key].total_seconds())
+                    hours = total_seconds // 3600
+                    minutes = (total_seconds % 3600) // 60
+                    dest[key] = f"{hours:02d}:{minutes:02d}"
+         
+            for json_field in ['image', 'highlights']:
+                if dest.get(json_field):
+                    try:
+                        dest[json_field] = json.loads(dest[json_field])
+                    except:
+                        pass 
+
+        return jsonify({"{!} Achtung": "Access Verborten!"}), 403
+
+    except mysql.connector.Error as e:
+        return jsonify({"{-} Error": str(e)}), 500
+    
 
 @destination_endpoints.route('/upload', methods=['POST'])
 @token_required
@@ -56,9 +86,9 @@ def upload_destination(current_user):
         description = request.form.get('description')
         rating = float(request.form.get("rating", 0))
         best_time_range = request.form.get("bestTime", "")
-        gmaps_url = request.form.get('gmapsUrl', "")
-        youtube_id = request.form.get('youtubeId', "")
-        youtube_link = f"https://www.youtube.com/watch?v={youtube_id}" if youtube_id else None
+        gmaps_url = request.form.get("gmapsUrl")
+        youtube_id = request.form.get('youtube_id', "")
+        youtube_id =        f"https://www.youtube.com/watch?v={youtube_id}" if youtube_id else None
 
         highlights_list = request.form.getlist("highlights")
         highlights_json = json.dumps(highlights_list)
@@ -99,7 +129,7 @@ def upload_destination(current_user):
         cursor.close()
         conn.close()
 
-        return jsonify({"{+} Success": "Destination uploaded successfully"}), 201
+        return jsonify({"{+} Success": "Uploaded"}), 201
 
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
@@ -110,9 +140,9 @@ def upload_destination(current_user):
 @admin_required
 def update_destination(current_user, destination_id):
     try:
-        data = request.get_json()
+        data = request.form
 
-        required_fields = ["name", "location", "category", "description", "image", "rating", "bestTime", "highlights"]
+        required_fields = ["name", "location", "category", "description", "image", "rating", "bestTime", "highlights", "gmapsUrl", "youtube_id"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"{-} Error": f"{field} is required"}), 400
@@ -126,7 +156,8 @@ def update_destination(current_user, destination_id):
         highlights = json.dumps(data.get("highlights", []))
         best_time_range = data.get("bestTime", "")
         gmaps_url = data.get("gmapsUrl", "")
-        youtube_link = f"https://www.youtube.com/watch?v={data.get('youtubeId')}" if data.get("youtubeId") else None
+        youtube_raw = data.get("youtube_id") or data.get("youtubeId")
+        youtube_id = f"https://www.youtube.com/watch?v={request.form.get('youtube_id')}" if request.form.get("youtube_id") else None
 
         best_time_range = best_time_range.replace("WITA", "").strip()
         try:
@@ -150,7 +181,7 @@ def update_destination(current_user, destination_id):
                 best_time_start = %s,
                 best_time_end = %s,
                 gmaps_url = %s,
-                youtube_link = %s,
+                youtube_id = %s,
                 admin_id = %s
             WHERE id = %s
         """
@@ -165,7 +196,7 @@ def update_destination(current_user, destination_id):
             best_time_start,
             best_time_end,
             gmaps_url,
-            youtube_link,
+            youtube_id,
             current_user['id'],
             destination_id
         ))
@@ -173,7 +204,7 @@ def update_destination(current_user, destination_id):
         cursor.close()
         conn.close()
 
-        return jsonify({"{+} Success": "Destination updated successfully"}), 200
+        return jsonify({"{+} Success": "Updated"}), 200
 
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
@@ -188,7 +219,6 @@ def delete_destination(current_user, destination_id):
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Use correct column name: 'id'
         cursor.execute("SELECT image FROM destination WHERE id = %s", (destination_id,))
         destination = cursor.fetchone()
         if not destination:
@@ -213,6 +243,24 @@ def delete_destination(current_user, destination_id):
             return jsonify({"{+} Success": f"Deleted {len(deleted)} image(s) and destination"}), 200
         except Exception as e:
             return jsonify({"{-} Warning": f"Destination deleted, but image deletion failed: {str(e)}"}), 200
+
+    except mysql.connector.Error as e:
+        return jsonify({"{-} Error": str(e)}), 500
+
+@destination_endpoints.route('/review/<int:destination_id>', methods=['GET'])
+def get_destination_reviews(destination_id):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM review WHERE destination_id = %s", (destination_id,))
+        reviews = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        if not reviews:
+            return jsonify({"{!}": "No reviews found for this destination"}), 404
+
+        return jsonify({"Reviews": reviews}), 200
 
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500

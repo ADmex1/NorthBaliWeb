@@ -56,7 +56,7 @@ def register():
     cursor.execute("SELECT COUNT(*) AS user_count FROM users")
     user_count = cursor.fetchone()['user_count']
 
-    role = data.get('role', 'user')
+    role = data.get('role', 'user') 
     if role == 'admin':
         if user_count > 0:
             if 'Authorization' not in request.headers:
@@ -104,8 +104,5 @@ def login():
         'exp': datetime.datetime.utcnow()+(datetime.timedelta(hours=1))
     },app.config['SECRET_KEY'], algorithm="HS256")
 
-    return jsonify({
-        "{+}" : "Login Success",
-        'token':token
-    }), 200
+    return jsonify({"{+}" : "Login Success", 'token':token}), 200
 
