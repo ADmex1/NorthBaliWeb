@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mountain, Menu, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Mountain, Menu, X, User, LogIn } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Efek untuk mendeteksi scroll
@@ -26,8 +28,8 @@ const Header = () => {
     <header 
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-gray-800/90 backdrop-blur-sm shadow-lg' // Style saat di-scroll
-          : 'bg-gray-800 shadow-md' // Style awal
+          ? 'bg-gray-800/90 backdrop-blur-sm shadow-lg' // Style saat di-scroll (semi-transparan)
+          : 'bg-gray-800 shadow-md' // Style awal (solid)
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,6 +43,11 @@ const Header = () => {
             <Link to="/destinasi" className="font-medium text-gray-300 hover:text-white">Destinasi</Link>
             <Link to="/edukasi" className="font-medium text-gray-300 hover:text-white">Edukasi</Link>
             <Link to="/tentang" className="font-medium text-gray-300 hover:text-white">Tentang</Link>
+            {user ? (
+              <Link to="/profile" className="text-gray-300 hover:text-white"><User /></Link>
+            ) : (
+              <Link to="/login" className="flex items-center gap-2 font-medium text-gray-300 hover:text-white"><LogIn size={16}/> Login</Link>
+            )}
           </nav>
           <div className="md:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-300 hover:text-white">
@@ -51,10 +58,15 @@ const Header = () => {
       </div>
       {isMenuOpen && (
         <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-700 bg-gray-800">
-          <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Home</Link>
-          <Link to="/destinasi" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Destinasi</Link>
-          <Link to="/edukasi" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Edukasi</Link>
-          <Link to="/tentang" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Tentang</Link>
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Home</Link>
+            <Link to="/destinasi" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Destinasi</Link>
+            <Link to="/edukasi" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Edukasi</Link>
+            <Link to="/tentang" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Tentang</Link>
+            {user ? (
+                 <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Profil</Link>
+            ) : (
+                 <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Login</Link>
+            )}
         </div>
       )}
     </header>

@@ -8,45 +8,38 @@ import HomePage from './pages/HomePage.jsx';
 import DestinationDetail from './pages/DestinationDetail.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import DestinationsPage from './pages/DestinationsPage.jsx';
-import EdukasiPage from './pages/EdukasiPage.jsx'; // <-- 1. Impor halaman baru
+import EdukasiPage from './pages/EdukasiPage.jsx';
 import PageTransition from './components/PageTransition.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import AuthProvider from './context/AuthContext.jsx'; // <-- PASTIKAN IMPOR SEPERTI INI
 
 function App() {
   const location = useLocation();
 
   return (
-    <div className="bg-gray-200">
-      <ScrollToTop />
-      <Header />
-      <main>
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route 
-              path="/" 
-              element={<PageTransition><HomePage /></PageTransition>} 
-            />
-            <Route 
-              path="/destinasi" 
-              element={<PageTransition><DestinationsPage /></PageTransition>} 
-            />
-            <Route 
-              path="/destinasi/:id" 
-              element={<PageTransition><DestinationDetail /></PageTransition>} 
-            />
-            {/* 2. Tambahkan rute baru untuk halaman edukasi */}
-            <Route 
-              path="/edukasi" 
-              element={<PageTransition><EdukasiPage /></PageTransition>} 
-            />
-            <Route 
-              path="/tentang" 
-              element={<PageTransition><AboutPage /></PageTransition>} 
-            />
-          </Routes>
-        </AnimatePresence>
-      </main>
-      <Footer />
-    </div>
+    <AuthProvider>
+      <div className="bg-gray-200">
+        <ScrollToTop />
+        <Header />
+        <main>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
+              <Route path="/destinasi" element={<PageTransition><DestinationsPage /></PageTransition>} />
+              <Route path="/destinasi/:id" element={<PageTransition><DestinationDetail /></PageTransition>} />
+              <Route path="/edukasi" element={<PageTransition><EdukasiPage /></PageTransition>} />
+              <Route path="/tentang" element={<PageTransition><AboutPage /></PageTransition>} />
+              <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+              <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
+              <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 }
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import Hero from '../components/Hero.jsx';
-import Introduction from '../components/Introduction.jsx'; // <-- 1. Impor komponen baru
-import { Leaf, Waves, Coffee, Smile } from 'lucide-react';
+import Introduction from '../components/Introduction.jsx';
+import InteractiveMap from '../components/InteractiveMap.jsx';
 import { Link } from 'react-router-dom';
+import { Leaf, Waves, Coffee, Smile } from 'lucide-react';
 
 const HomePage = () => {
     return (
@@ -10,9 +11,9 @@ const HomePage = () => {
             <Hero />
             <div className="max-w-screen-xl mx-auto bg-white shadow-xl">
                 
-                {/* 2. Sisipkan komponen Introduction di sini */}
                 <Introduction />
 
+                {/* Mengembalikan seksi "Mengapa Memilih Bali Utara" */}
                 <section id="why-north-bali" className="bg-gray-50 py-16 sm:py-24 border-t border-gray-200">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
@@ -50,6 +51,9 @@ const HomePage = () => {
                         </div>
                     </div>
                 </section>
+
+                <InteractiveMap />
+
             </div>
         </>
     );
