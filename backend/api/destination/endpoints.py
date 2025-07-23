@@ -36,10 +36,9 @@ def destination_list():
                 if dest.get(json_field):
                     try:
                         dest[json_field] = json.loads(dest[json_field])
-                    except:
+                    except Exception:
                         pass 
-        
-        destinations.pop('admin_id', None)
+            dest.pop('admin_id', None)
         return jsonify({"{+} Destination Data": destinations}), 200
 
     except mysql.connector.Error as e:
@@ -55,29 +54,29 @@ def get_destination_by_id(destination_id):
         cursor.close()
         conn.close()
 
-        for dest in destinations:
-            for key in ['best_time_start', 'best_time_end']:
-                if isinstance(dest.get(key), timedelta):
-                    total_seconds = int(dest[key].total_seconds())
-                    hours = total_seconds // 3600
-                    minutes = (total_seconds % 3600) // 60
-                    dest[key] = f"{hours:02d}:{minutes:02d}"
-         
-            for json_field in ['image', 'highlights']:
-                if dest.get(json_field):
-                    try:
-                        dest[json_field] = json.loads(dest[json_field])
-                    except:
-                        pass 
+        if not destinations:
+            return jsonify({"{-} Error": "Destination not found"}), 404
+
+        dest = destinations[0]
+        for key in ['best_time_start', 'best_time_end']:
+            if isinstance(dest.get(key), timedelta):
+                total_seconds = int(dest[key].total_seconds())
+                hours = total_seconds // 3600
+                minutes = (total_seconds % 3600) // 60
+                dest[key] = f"{hours:02d}:{minutes:02d}"
+
+        for json_field in ['image', 'highlights']:
+            if dest.get(json_field):
+                try:
+                    dest[json_field] = json.loads(dest[json_field])
+                except:
+                    pass 
         dest.pop('admin_id', None)
-        #dest.pop('destination_id', None)
         return jsonify({"{+} Destination Data": dest}), 200
 
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500
     
-
-@destination_endpoints.route('/upload', methods=['POST'])
 @token_required
 @admin_required
 def upload_destination(current_user):
