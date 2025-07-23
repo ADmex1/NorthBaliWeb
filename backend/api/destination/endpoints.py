@@ -38,7 +38,8 @@ def destination_list():
                         dest[json_field] = json.loads(dest[json_field])
                     except:
                         pass 
-
+        
+        destinations.pop('admin_id', None)
         return jsonify({"{+} Destination Data": destinations}), 200
 
     except mysql.connector.Error as e:
@@ -68,8 +69,9 @@ def get_destination_by_id(destination_id):
                         dest[json_field] = json.loads(dest[json_field])
                     except:
                         pass 
-
-        return jsonify({"{!} Achtung": "Access Verborten!"}), 403
+        dest.pop('admin_id', None)
+        #dest.pop('destination_id', None)
+        return jsonify({"{+} Destination Data": dest}), 200
 
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500
