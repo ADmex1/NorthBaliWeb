@@ -75,7 +75,7 @@ def get_destination_by_id(destination_id):
 
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500
-    
+@destination_endpoints.route('/upload', methods=['POST'])
 @token_required
 @admin_required
 def upload_destination(current_user):
