@@ -112,4 +112,5 @@ def login():
             'username': user['username'],  
             'email': user['email'],
         },
+        token: token
     }), 200
