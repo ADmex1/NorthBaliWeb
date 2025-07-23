@@ -1,0 +1,477 @@
+{
+	"info": {
+		"_postman_id": "2ca4b3cb-5f71-449b-960c-350d56ca3bf5",
+		"name": "North Bali Web API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39835576"
+	},
+	"item": [
+		{
+			"name": "User Api",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"retard@gmail.com\",\r\n    \"username\": \"retard\",\r\n    \"password\": \"retard\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5001/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"retard@gmail.com\",\r\n\"password\": \"retard\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5001/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Token Bearer",
+			"item": [
+				{
+					"name": "Admin Token Bearer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFEbWV4MUBnbWFpbC5jb20iLCJleHAiOjE3NTMwNzYxMjR9.ziqYftrKzKm7Kh1W2_CSFfTx3A1F6Y1-t4XA_KUWOgQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/protected/admin",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"protected",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Token Bearer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/protected/user",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"protected",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Destination API (Admin Req)",
+			"item": [
+				{
+					"name": "Destination List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/destination/destination-list",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"destination",
+								"destination-list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Destination",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFEbWV4MUBnbWFpbC5jb20iLCJleHAiOjE3NTMxNzA5MDJ9.rrRO0rNHtgrIDpOCSaZsNpTXri7jMPbm4JFWMwd8m44",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Pantai Lovina",
+									"type": "text"
+								},
+								{
+									"key": "location",
+									"value": "Singaraja, Buleleng",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Pantai",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Pantai berpasir hitam yang terkenal dengan atraksi lumba-lumba liar di pagi hari. Suasananya yang tenang dan ombak yang tidak terlalu besar menjadikannya tempat yang sempurna untuk bersantai, berenang, dan menikmati pemandangan matahari terbit yang memukau.",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "c:\\Users\\ASUS ROG\\OneDrive\\Pictures\\webImages\\lovina1.avif"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "c:\\Users\\ASUS ROG\\OneDrive\\Pictures\\webImages\\lovina2.avif"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "c:\\Users\\ASUS ROG\\OneDrive\\Pictures\\webImages\\lovina3.avif"
+								},
+								{
+									"key": "rating",
+									"value": "4.8",
+									"type": "text"
+								},
+								{
+									"key": "bestTime",
+									"value": "05:30 - 08:00 WITA",
+									"type": "text"
+								},
+								{
+									"key": "gmaps_url",
+									"value": "https://maps.google.com/?cid=8431000252746584700",
+									"type": "text"
+								},
+								{
+									"key": "youtube_link",
+									"value": "kOPptmTo_5s",
+									"type": "text"
+								},
+								{
+									"key": "highlights",
+									"value": "Melihat Lumba-lumba",
+									"type": "text"
+								},
+								{
+									"key": "highlights",
+									"value": "Snorkeling",
+									"type": "text"
+								},
+								{
+									"key": "highlights",
+									"value": "Matahari Terbit",
+									"type": "text"
+								},
+								{
+									"key": "highlights",
+									"value": "Perahu Tradisional",
+									"type": "text"
+								}
+							],
+							"options": {
+								"formdata": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5001/destination/upload",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"destination",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New request",
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/destination/update",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"destination",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Destination Spot",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFEbWV4MUBnbWFpbC5jb20iLCJleHAiOjE3NTMxMTg0NjF9.xSl21BL-ukGcc25twhtR5j9zLQ5sssNLrmXosLhGMIo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/destination/delete",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"destination",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Review API",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFEbWV4MUBnbWFpbC5jb20iLCJleHAiOjE3NTMyMDYwMTJ9.6hth_e5NuKcnCi9CBweAP8PeQlh3d-RFTBybSXmvoVQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "comment",
+									"value": "Would come back again!",
+									"type": "text"
+								},
+								{
+									"key": "rating",
+									"value": "4.5",
+									"type": "text"
+								},
+								{
+									"key": "destination_id",
+									"value": "9",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5001/review/upload",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"review",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/review/update/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"review",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/review/delete/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"review",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5001/destination/review/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5001",
+							"path": [
+								"destination",
+								"review",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
