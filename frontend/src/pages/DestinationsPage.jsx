@@ -1,25 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DestinationCard from '../components/DestinationCard.jsx';
-import { destinations, categories } from '../data/destinations.js';
-import { Search } from 'lucide-react'; // 1. Impor ikon Search
+import { Search } from 'lucide-react';
+
+const categories = [
+    "Semua",
+    "Pantai",
+    "Pegunungan",
+    "Budaya",
+    "Air Terjun",
+    "Kuliner",
+    // ...tambahkan kategori lain sesuai kebutuhan
+];
 
 const DestinationsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState("Semua");
-    const [searchTerm, setSearchTerm] = useState(""); // 2. Tambahkan state untuk search
+    const [searchTerm, setSearchTerm] = useState("");
+    const [destinations, setDestinations] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // 3. Perbarui logika filter untuk mencakup pencarian dan kategori
+    useEffect(() => {
+        const fetchDestinations = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await fetch('http://127.0.0.1:5001/destination/destination-list');
+                if (!response.ok) throw new Error('Gagal memuat destinasi');
+                const destinations = await response.json();
+                setDestinations(destinations);
+            } catch (error) {
+                setDestinations([]);
+                setError('Tidak dapat terhubung ke server atau destinasi tidak ditemukan.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDestinations();
+    }, []);
+
     const filteredDestinations = destinations
-      .filter(dest => {
-        // Filter berdasarkan kategori
-        if (selectedCategory === "Semua") {
-          return true;
-        }
-        return dest.category === selectedCategory;
-      })
-      .filter(dest => {
-        // Filter berdasarkan nama dari hasil filter kategori
-        return dest.name.toLowerCase().includes(searchTerm.toLowerCase());
-      });
+        .filter(dest => {
+            if (selectedCategory === "Semua") return true;
+            return dest.category === selectedCategory;
+        })
+        .filter(dest => dest.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return (
         <div className="max-w-screen-xl mx-auto bg-white shadow-xl">
@@ -32,7 +56,6 @@ const DestinationsPage = () => {
                         </p>
                     </div>
 
-                    {/* 4. Tambahkan elemen Search Bar di sini */}
                     <div className="max-w-lg mx-auto mb-12">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -54,8 +77,8 @@ const DestinationsPage = () => {
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
                                 className={`px-5 py-2 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 ${selectedCategory === category
-                                        ? 'bg-cyan-600 text-white shadow-lg'
-                                        : 'bg-white text-gray-700 hover:bg-cyan-50 border border-gray-200'
+                                    ? 'bg-cyan-600 text-white shadow-lg'
+                                    : 'bg-white text-gray-700 hover:bg-cyan-50 border border-gray-200'
                                     }`}
                             >
                                 {category}
@@ -63,20 +86,28 @@ const DestinationsPage = () => {
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredDestinations.length > 0 ? (
-                            filteredDestinations.map(destination => (
-                                <DestinationCard
-                                    key={destination.id}
-                                    destination={destination}
-                                />
-                            ))
-                        ) : (
-                            <p className="col-span-full text-center text-gray-500">
-                                Destinasi tidak ditemukan.
-                            </p>
-                        )}
-                    </div>
+                    {error && (
+                        <p className="text-center text-red-500 mb-8">{error}</p>
+                    )}
+
+                    {loading ? (
+                        <p className="text-center text-gray-500">Memuat destinasi...</p>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredDestinations.length > 0 ? (
+                                filteredDestinations.map(destination => (
+                                    <DestinationCard
+                                        key={destination.id}
+                                        destination={destination}
+                                    />
+                                ))
+                            ) : (
+                                <p className="col-span-full text-center text-gray-500">
+                                    Destinasi tidak ditemukan.
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </div>
             </section>
         </div>

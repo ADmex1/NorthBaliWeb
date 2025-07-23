@@ -7,7 +7,9 @@ from api.auth.endpoints import auth_endpoint
 from api.data_protected.endpoints import protected_data_endpoint
 from api.userreview.endpoints import userreview_endpoints
 from api.destination.endpoints import destination_endpoints
+from flask_cors import CORS
 import os
+import datetime
 
 load_dotenv()
 
@@ -38,7 +40,7 @@ app.register_blueprint(protected_data_endpoint, url_prefix='/protected')
 app.register_blueprint(userreview_endpoints, url_prefix = '/review')
 app.register_blueprint(destination_endpoints, url_prefix= '/destination')
 
-
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
 
 if __name__ == '__main__':
     app.run(debug=True)

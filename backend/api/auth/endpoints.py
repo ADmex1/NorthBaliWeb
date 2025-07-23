@@ -83,26 +83,33 @@ def register():
 
     return jsonify({"{-}": "Registration success!"}), 201
 
+
 @auth_endpoint.route('/login', methods=['POST'])
 def login():
-    data=request.get_json()
+    data = request.get_json()
     if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'{+}': 'Insert all credentials!'}),400
-    
+        return jsonify({'message': 'Email and password required!'}), 400
+
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users where email = %s", (data['email'],))
+    cursor.execute("SELECT * FROM users WHERE email = %s", (data['email'],))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
 
     if not user or not check_password_hash(user['password'], data['password']):
-        return jsonify({"{-}": "Invalid Email or Password!"}),401
-    
+        return jsonify({'message': 'Email or password is invalid, Please put the right credentials!'}), 401
+
     token = jwt.encode({
-        'email' : user['email'],
-        'exp': datetime.datetime.utcnow()+(datetime.timedelta(hours=1))
-    },app.config['SECRET_KEY'], algorithm="HS256")
+        'id': user['id'],
+        'email': user['email'],
+        'username': user['username'], 
+        'exp': datetime.datetime.utcnow() + app.config['JWT_ACCESS_TOKEN_EXPIRES']
+    }, app.config['SECRET_KEY'], algorithm='HS256')
 
-    return jsonify({"{+}" : "Login Success", 'token':token}), 200
-
+    return jsonify({
+        'user': {
+            'username': user['username'],  
+            'email': user['email'],
+        },
+    }), 200

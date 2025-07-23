@@ -31,7 +31,6 @@ def destination_list():
                     hours = total_seconds // 3600
                     minutes = (total_seconds % 3600) // 60
                     dest[key] = f"{hours:02d}:{minutes:02d}"
-         
             for json_field in ['image', 'highlights']:
                 if dest.get(json_field):
                     try:
@@ -39,10 +38,10 @@ def destination_list():
                     except Exception:
                         pass 
             dest.pop('admin_id', None)
-        return jsonify({"{+} Destination Data": destinations}), 200
+        return jsonify(destinations), 200  # <-- Return as a plain array
 
     except mysql.connector.Error as e:
-        return jsonify({"{-} Error": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
     
 @destination_endpoints.route('/<int:destination_id>', methods=['GET'])
 def get_destination_by_id(destination_id):

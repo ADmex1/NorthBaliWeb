@@ -1,17 +1,18 @@
 import React from 'react';
 import { MapPin, Star } from 'lucide-react';
-import { Link } from 'react-router-dom'; // <-- 1. IMPORT LINK
+import { Link } from 'react-router-dom';
 
 const DestinationCard = ({ destination }) => {
+  const imageUrl = `http://127.0.0.1:5001/${destination.image[0]}`; // Fix: prepend base URL
+
   return (
-    // 2. BUNGKUS SEMUANYA DENGAN KOMPONEN LINK
-    <Link 
-      to={`/destinasi/${destination.id}`} // <-- 3. TENTUKAN URL TUJUAN
+    <Link
+      to={`/destinasi/${destination.id}`}
       className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer block"
     >
       <div className="relative">
         <img
-          src={destination.images[0]}
+          src={imageUrl}
           alt={destination.name}
           className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
         />
