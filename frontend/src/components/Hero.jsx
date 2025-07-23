@@ -6,7 +6,7 @@ const Hero = () => {
     <section className="relative h-[60vh] md:h-[80vh] flex items-center justify-center text-white">
       <div className="absolute inset-0 z-0">
         <img
-          src="Paket-Tour-Bali-Utara-1-Hari-Tanpa-Hotel-Twitter.jpg"
+          src="home/bratan2.jpg"
           alt="Pura Ulun Danu Bratan"
           className="w-full h-full object-cover"
         />

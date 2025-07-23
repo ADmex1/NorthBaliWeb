@@ -35,8 +35,6 @@ const AboutPage = () => {
   return (
     <div className="bg-white">
       {/* Seksi Utama Tentang Kami */}
-       <div className="bg-white">
-      {/* Seksi Utama Tentang Kami */}
       <div className="flex flex-col lg:flex-row min-h-screen">
         <div className="w-full lg:w-5/12 bg-white p-8 sm:p-12 flex flex-col justify-center">
           <div className="max-w-md mx-auto lg:mr-0 lg:ml-auto lg:pr-16">
@@ -46,34 +44,25 @@ const AboutPage = () => {
             <p className="mt-6 text-lg text-gray-600">
               Kami adalah tim pencinta perjalanan yang bersemangat untuk berbagi keajaiban dan pesona otentik dari Bali Utara.
             </p>
-            <div className="mt-10 prose prose-lg text-gray-700">
-              <p>
-                Berawal dari pengalaman pribadi menjelajahi setiap sudut wilayah ini, kami tergerak untuk membuat sebuah platform yang bisa menjadi jembatan antara keindahan tersembunyi Bali Utara dengan para wisatawan seperti Anda.
-              </p>
-              <p>
-                Misi kami sederhana: menyediakan informasi yang akurat, jujur, dan mudah diakses. Kami percaya bahwa setiap orang berhak merasakan pengalaman liburan yang tak terlupakan, jauh dari keramaian, dan lebih dekat dengan alam serta budaya lokal yang tulus.
-              </p>
-            </div>
           </div>
         </div>
         <div className="w-full lg:w-7/12 h-64 lg:h-auto lg:rounded-l-[100px] overflow-hidden lg:-ml-0">
           <img
-            src="kerja.jpg"
+            src="/kerja.jpg"
             alt="Tim Wisata Bali Utara sedang berdiskusi"
             className="w-full h-full object-cover"
           />
         </div>
       </div>
-    </div>
 
       {/* Seksi Penjelasan Tambahan */}
       <div className="py-16 sm:py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
-            <div className="relative">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+            <div className="relative h-96">
               <img
                 className="rounded-2xl shadow-xl w-full h-full object-cover"
-                src="kerja1.jpg"
+                src="/home/tentang1.jpg"
                 alt="Tim Wisata Bali Utara sedang merencanakan perjalanan"
               />
             </div>
