@@ -10,7 +10,7 @@ const Introduction = () => {
           {/* Kolom Kiri: Gambar Interaktif */}
           <div className="group rounded-xl overflow-hidden shadow-lg">
             <img 
-              src="bali.jpg" 
+              src="home/pejarakan1.jpg" 
               alt="Pemandangan Danau Tamblingan di Bali Utara"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />

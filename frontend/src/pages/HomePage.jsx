@@ -2,6 +2,7 @@ import React from 'react';
 import Hero from '../components/Hero.jsx';
 import Introduction from '../components/Introduction.jsx';
 import InteractiveMap from '../components/InteractiveMap.jsx';
+import DocumentationSlider from '../components/DocumentationSlider.jsx'; // <-- 1. Impor komponen baru
 import { Link } from 'react-router-dom';
 import { Leaf, Waves, Coffee, Smile } from 'lucide-react';
 
@@ -13,13 +14,13 @@ const HomePage = () => {
                 
                 <Introduction />
 
-                {/* Mengembalikan seksi "Mengapa Memilih Bali Utara" */}
-                <section id="why-north-bali" className="bg-gray-50 py-16 sm:py-24 border-t border-gray-200">
+                <section id="why-north-bali" className="bg-white py-16 sm:py-24 border-t border-gray-200">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Mengapa Memilih Bali Utara?</h2>
                             <p className="mt-4 text-lg text-gray-600">
-                                Temukan pesona otentik yang membedakannya dari bagian lain di Bali.
+                                Bali Utara, yang mencakup kabupaten Buleleng dengan Singaraja sebagai ibu kotanya, menawarkan pengalaman wisata yang autentik dan berbeda dari hiruk-pikuk Bali Selatan yang sudah sangat komersial. 
+                                Wilayah ini merupakan destinasi yang sempurna bagi wisatawan yang mencari ketenangan, keaslian budaya Bali, dan keindahan alam yang masih terjaga dengan baik.
                             </p>
                         </div>
                         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -44,13 +45,11 @@ const HomePage = () => {
                                 <p className="mt-2 text-base text-gray-600">Jauh dari keramaian, Bali Utara menawarkan ketenangan dan relaksasi sejati.</p>
                             </div>
                         </div>
-                        <div className="text-center mt-16">
-                            <Link to="/destinasi" className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-3 rounded-full font-semibold text-lg transition-all transform hover:scale-105">
-                                Lihat Semua Destinasi
-                            </Link>
-                        </div>
                     </div>
                 </section>
+
+                {/* 2. Sisipkan komponen DocumentationSlider di sini */}
+                <DocumentationSlider />
 
                 <InteractiveMap />
 

@@ -18,7 +18,7 @@ const LoginPage = () => {
     return (
         <div className="min-h-screen bg-[#2d3748] flex">
             {/* Kolom Kiri (Gambar & Tagline) */}
-            <div className="hidden lg:flex w-1/2 bg-cover bg-center relative items-end p-12" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?q=80&w=1200&auto=format&fit=crop')" }}>
+            <div className="hidden lg:flex w-1/2 bg-cover bg-center relative items-end p-12" style={{ backgroundImage: "url('/home/kerja1.jpg')" }}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="relative z-10">
                     <h2 className="text-4xl font-bold text-white">Selamat Datang Kembali,</h2>
