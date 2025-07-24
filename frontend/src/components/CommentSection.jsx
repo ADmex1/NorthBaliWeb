@@ -1,27 +1,31 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageCircle, Send, Star } from 'lucide-react';
 
 const CommentSection = () => {
   const [comments, setComments] = useState([
-    { name: "Budi", text: "Tempatnya indah sekali, udaranya sejuk!", time: "2 hari yang lalu" },
-    { name: "Ani", text: "Sangat direkomendasikan untuk liburan keluarga.", time: "1 hari yang lalu" },
+    { name: "Budi", text: "Tempatnya indah sekali, udaranya sejuk!", time: "2 hari yang lalu", rating: 5 },
+    { name: "Ani", text: "Sangat direkomendasikan untuk liburan keluarga.", time: "1 hari yang lalu", rating: 4 },
   ]);
   const [commentText, setCommentText] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const { user } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (commentText.trim() === "" || !user) return;
+    if (commentText.trim() === "" || rating === 0 || !user) return;
 
     const newComment = {
       name: user.displayName || "Pengguna",
       text: commentText,
-      time: "Baru saja"
+      time: "Baru saja",
+      rating: rating,
     };
     setComments([newComment, ...comments]);
     setCommentText("");
+    setRating(0);
   };
 
   return (
@@ -31,6 +35,32 @@ const CommentSection = () => {
         {user ? (
           <form onSubmit={handleSubmit}>
             <div className="mb-4"><label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nama</label><input type="text" id="name" value={user.displayName || ''} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed" /></div>
+            
+            {/* Fitur Rating Bintang */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rating Anda</label>
+              <div className="flex items-center">
+                {[...Array(5)].map((_, index) => {
+                  const starValue = index + 1;
+                  return (
+                    <button
+                      type="button"
+                      key={starValue}
+                      onClick={() => setRating(starValue)}
+                      onMouseEnter={() => setHoverRating(starValue)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      className="text-yellow-400"
+                    >
+                      <Star
+                        size={24}
+                        fill={(hoverRating || rating) >= starValue ? 'currentColor' : 'none'}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="mb-4"><label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Komentar</label><textarea id="comment" value={commentText} onChange={(e) => setCommentText(e.target.value)} rows="4" placeholder="Tulis ulasan Anda di sini..." className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" required></textarea></div>
             <button type="submit" className="inline-flex items-center gap-2 bg-cyan-600 text-white px-6 py-2 rounded-lg hover:bg-cyan-700 transition-colors"><Send size={16} />Kirim Ulasan</button>
           </form>
@@ -49,7 +79,13 @@ const CommentSection = () => {
                 <p className="font-semibold text-gray-800">{comment.name || 'Pengguna'}</p>
                 <p className="text-xs text-gray-500">{comment.time}</p>
               </div>
-              <p className="text-gray-700 mt-1">{comment.text}</p>
+              {/* Menampilkan Rating Bintang */}
+              <div className="flex items-center my-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={14} className="text-yellow-400" fill={i < comment.rating ? 'currentColor' : 'none'} />
+                ))}
+              </div>
+              <p className="text-gray-700">{comment.text}</p>
             </div>
           </div>
         ))}

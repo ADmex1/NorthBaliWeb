@@ -52,7 +52,7 @@ const RegisterPage = () => {
 
     return (
         <div className="min-h-screen bg-[#1a202c] flex">
-            <div className="hidden lg:flex w-1/2 bg-cover bg-center relative items-end p-12" style={{ backgroundImage: "url('/home/kerja2.jpg')" }}>
+            <div className="hidden lg:flex w-1/2 bg-cover bg-center relative items-end p-12" style={{ backgroundImage: "url('/home/bratan1.jpg')" }}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="relative z-10">
                     <h2 className="text-4xl font-bold text-white">Buat Akun Baru</h2>
