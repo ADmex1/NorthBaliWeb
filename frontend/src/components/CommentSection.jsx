@@ -91,7 +91,7 @@ const CommentSection = () => {
     if (!window.confirm("Delete this review?")) return;
 
     try {
-      await axios.delete(`http://localhost:5001/review/delete/${reviewId}`, {
+      await axios.delete(`http://localhost:5001/review/${reviewId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

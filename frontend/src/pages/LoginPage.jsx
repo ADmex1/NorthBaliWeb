@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn } from 'lucide-react';
+import { jwtDecode } from 'jwt-decode'; // ✅ Fix: Named import
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -24,15 +25,22 @@ const LoginPage = () => {
             const data = await response.json();
 
             if (response.ok) {
+                const decoded = jwtDecode(data.token); // ✅ Decode the JWT token
                 const userData = {
-                    id: data.user?.id || data.users?.id,
-                    email: data.user?.email || data.users?.email,
-                    username: data.user?.username || data.users?.username,
+                    id: decoded.id,
+                    email: decoded.email,
+                    username: decoded.username,
                     token: data.token,
                 };
 
-                login(userData, data.token); // Set context
-                navigate('/profile');
+                login(userData, data.token); // Set auth context
+
+                const isAdmin = decoded.email === 'ADmex1@gmail.com';
+                if (isAdmin) {
+                    navigate('/admin');
+                } else {
+                    navigate('/profile');
+                }
             } else {
                 alert(data?.['{-}'] || data?.message || 'Login gagal.');
             }

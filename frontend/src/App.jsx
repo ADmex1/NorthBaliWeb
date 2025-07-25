@@ -14,7 +14,8 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import AuthProvider from './context/AuthContext.jsx'; // <-- PASTIKAN IMPOR SEPERTI INI
-
+import AdminDashboard from './pages/AdminDashboard.jsx'; // Impor dashboard admin jika ada
+import Forbidden403 from './components/Forbidden403.jsx'; // Impor komponen Forbidden403
 function App() {
   const location = useLocation();
 
@@ -34,6 +35,9 @@ function App() {
               <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
               <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
               <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
+              <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
+              <Route path="/403" element={<PageTransition><Forbidden403 /></PageTransition>} />
+
             </Routes>
           </AnimatePresence>
         </main>

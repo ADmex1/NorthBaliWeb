@@ -9,15 +9,13 @@ const ProfilePage = () => {
 
     if (!user) {
         return (
-             <div className="max-w-screen-xl mx-auto bg-white shadow-xl text-center py-40">
+            <div className="max-w-screen-xl mx-auto bg-white shadow-xl text-center py-40">
                 <p>Silakan login untuk melihat halaman ini.</p>
                 <Link to="/login" className="text-cyan-600 hover:underline">Login</Link>
             </div>
         );
     }
-
-    // Tampilkan dashboard jika admin, jika tidak tampilkan profil biasa
     return user.isAdmin ? <AdminDashboard /> : <UserProfile />;
-};
 
+};
 export default ProfilePage;

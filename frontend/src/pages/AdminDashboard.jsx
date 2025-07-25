@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { destinations } from '../data/destinations.js';
 import {
     LayoutDashboard,
@@ -31,6 +31,10 @@ const AdminDashboard = () => {
     const [destinationList, setDestinationList] = useState(destinations);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    if (!user || !user.isAdmin) {
+        return <Navigate to="/403" replace />;
+    }
 
     const handleDelete = (id) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus destinasi ini?')) {
