@@ -12,31 +12,43 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
         if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]
-            if not token:
-                return jsonify({"Message": "Token is Missing"}),401
             try:
+                token = request.headers['Authorization'].split(" ")[1]
+                if not token:
+                    return jsonify({"Message": "Token is missing"}), 401
+
+                # Decode token
                 data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+
+                # Fetch user from DB
                 conn = get_connection()
                 cursor = conn.cursor(dictionary=True)
                 cursor.execute("SELECT * FROM users WHERE email = %s", (data['email'],))
                 current_user = cursor.fetchone()
                 cursor.close()
                 conn.close()
+
                 if not current_user:
                     return jsonify({"Error": "User not found!"}), 401
-            except:
-                return jsonify({"{-}": "Token Invalid"}), 401
+
+            except jwt.ExpiredSignatureError:
+                return jsonify({"Error": "Token expired"}), 401
+            except jwt.InvalidTokenError:
+                return jsonify({"Error": "Token is invalid"}), 401
+            except Exception as e:
+                return jsonify({"Error": f"Token processing failed: {str(e)}"}), 401
+
             return f(current_user, *args, **kwargs)
-        
-        return jsonify({"Message": "Token is missing!"}), 401
+
+        return jsonify({"Message": "Authorization header missing!"}), 401
     return decorated
+
 
 def admin_required(f):
     @wraps(f)
     def decorated(current_user, *args, **kwargs):
         if current_user['role'] != 'admin':
-            return jsonify({'Message': 'Required Admin Privileges'}),403
+            return jsonify({'{!}': 'Access Denied!'}),403
         return f (current_user, *args, **kwargs)
     return decorated
 
@@ -80,8 +92,22 @@ def register():
     conn.commit()
     cursor.close()
     conn.close()
+    token = jwt.encode({
+        'id': data['email'],
+        'email': data['email'],
+        'username': data['username'],
+        'exp': datetime.datetime.utcnow() + app.config['JWT_ACCESS_TOKEN_EXPIRES']
+    }, app.config['SECRET_KEY'], algorithm='HS256')
 
-    return jsonify({"{-}": "Registration success!"}), 201
+
+    return jsonify({
+    "message": "Registration Success",
+    "token": token,
+    "users": {
+        "username": data['username'],
+        "email": data['email']
+    }
+}), 201
 
 
 @auth_endpoint.route('/login', methods=['POST'])

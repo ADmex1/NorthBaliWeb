@@ -12,7 +12,7 @@ const UserProfile = () => {
         logout();
         navigate('/');
     };
-    
+
     // ... (kode renderContent dari ProfilePage lama bisa diletakkan di sini)
     const renderContent = () => {
         // ...
@@ -25,7 +25,7 @@ const UserProfile = () => {
                 <div className="w-full md:w-1/4 lg:w-1/5 bg-gray-800 p-6 text-white flex flex-col">
                     <div className="text-center mb-10">
                         <img src="https://via.placeholder.com/80" alt="Profile" className="w-20 h-20 rounded-full object-cover mx-auto ring-2 ring-cyan-400" />
-                        <h3 className="mt-4 text-lg font-semibold">{user?.displayName || 'Pengguna'}</h3>
+                        <p className='text=sm text-gray-400'>{user?.username}</p>
                         <p className="text-sm text-gray-400">{user?.email}</p>
                     </div>
                     <nav className="space-y-2 flex-grow">

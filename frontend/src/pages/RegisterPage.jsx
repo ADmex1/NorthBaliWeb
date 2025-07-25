@@ -4,8 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { UserPlus } from 'lucide-react';
 
 const RegisterPage = () => {
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { login } = useAuth();
@@ -21,8 +20,7 @@ const RegisterPage = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    first_name: firstName,
-                    last_name: lastName,
+                    username,
                     email,
                     password,
                 }),
@@ -31,14 +29,12 @@ const RegisterPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Optional: Store token if needed
                 localStorage.setItem('token', data.token);
 
-                // Login to context after successful registration
                 login({
-                    name: `${data.user.first_name} ${data.user.last_name}`,
-                    email: data.user.email,
-                });
+                    name: data.users.username,
+                    email: data.users.email,
+                }, data.token);
 
                 navigate('/profile');
             } else {
@@ -70,11 +66,34 @@ const RegisterPage = () => {
                         </Link>
                     </p>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <input type="text" placeholder="Nama Depan" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
-                        <input type="text" placeholder="Nama Belakang" value={lastName} onChange={(e) => setLastName(e.target.value)} required className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
-                        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
-                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
-                        <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-800">
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 bg-[#4a5568] text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                        <button
+                            type="submit"
+                            className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-800"
+                        >
                             <UserPlus className="w-5 h-5 mr-2" />
                             Daftar
                         </button>

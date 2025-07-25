@@ -1,95 +1,167 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { MessageCircle, Send, Star } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
-const CommentSection = () => {
-  const [comments, setComments] = useState([
-    { name: "Budi", text: "Tempatnya indah sekali, udaranya sejuk!", time: "2 hari yang lalu", rating: 5 },
-    { name: "Ani", text: "Sangat direkomendasikan untuk liburan keluarga.", time: "1 hari yang lalu", rating: 4 },
-  ]);
-  const [commentText, setCommentText] = useState("");
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const { user } = useAuth();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (commentText.trim() === "" || rating === 0 || !user) return;
-
-    const newComment = {
-      name: user.displayName || "Pengguna",
-      text: commentText,
-      time: "Baru saja",
-      rating: rating,
-    };
-    setComments([newComment, ...comments]);
-    setCommentText("");
-    setRating(0);
-  };
+const StarRating = ({ rating, setRating }) => {
+  const handleClick = (value) => setRating(value);
 
   return (
-    <div>
-      <div className="flex items-center gap-3 mb-6 pt-8"><MessageCircle className="w-8 h-8 text-cyan-600"/><h3 className="text-2xl font-bold text-gray-800">Ulasan Pengunjung</h3></div>
-      <div className="bg-gray-50 p-6 rounded-lg mb-8">
-        {user ? (
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4"><label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nama</label><input type="text" id="name" value={user.displayName || ''} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed" /></div>
-            
-            {/* Fitur Rating Bintang */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rating Anda</label>
-              <div className="flex items-center">
-                {[...Array(5)].map((_, index) => {
-                  const starValue = index + 1;
-                  return (
-                    <button
-                      type="button"
-                      key={starValue}
-                      onClick={() => setRating(starValue)}
-                      onMouseEnter={() => setHoverRating(starValue)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      className="text-yellow-400"
-                    >
-                      <Star
-                        size={24}
-                        fill={(hoverRating || rating) >= starValue ? 'currentColor' : 'none'}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mb-4"><label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Komentar</label><textarea id="comment" value={commentText} onChange={(e) => setCommentText(e.target.value)} rows="4" placeholder="Tulis ulasan Anda di sini..." className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" required></textarea></div>
-            <button type="submit" className="inline-flex items-center gap-2 bg-cyan-600 text-white px-6 py-2 rounded-lg hover:bg-cyan-700 transition-colors"><Send size={16} />Kirim Ulasan</button>
-          </form>
-        ) : (
-          <div className="text-center"><p className="text-gray-600"><Link to="/login" className="font-medium text-cyan-600 hover:text-cyan-500">Login</Link> untuk memberikan ulasan.</p></div>
-        )}
-      </div>
-      <div className="space-y-6">
-        {comments.map((comment, index) => (
-          <div key={index} className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600">
-              {(comment.name || 'P').charAt(0)}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <p className="font-semibold text-gray-800">{comment.name || 'Pengguna'}</p>
-                <p className="text-xs text-gray-500">{comment.time}</p>
-              </div>
-              {/* Menampilkan Rating Bintang */}
-              <div className="flex items-center my-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="text-yellow-400" fill={i < comment.rating ? 'currentColor' : 'none'} />
-                ))}
-              </div>
-              <p className="text-gray-700">{comment.text}</p>
-            </div>
+    <div className="flex items-center mb-2">
+      {[...Array(5)].map((_, i) => {
+        const full = i + 1;
+        const half = i + 0.5;
+        return (
+          <div key={i} className="relative w-6 h-6 text-yellow-400 cursor-pointer">
+            <span
+              onClick={() => handleClick(half)}
+              className={`absolute left-0 w-1/2 overflow-hidden ${rating >= half ? "text-yellow-400" : "text-gray-300"
+                }`}
+            >
+              ★
+            </span>
+            <span
+              onClick={() => handleClick(full)}
+              className={`absolute left-0 w-full ${rating >= full ? "text-yellow-400" : "text-gray-300"
+                }`}
+            >
+              ★
+            </span>
           </div>
-        ))}
-      </div>
+        );
+      })}
+      <span className="ml-2 text-sm text-gray-600">{rating}/5</span>
+    </div>
+  );
+};
+
+const CommentSection = () => {
+  const { id } = useParams(); // destination_id from URL
+  const { token, user } = useAuth();
+  const [reviews, setReviews] = useState([]);
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5001/review/destination/${id}/reviews`);
+      setReviews(res.data.reviews || []);
+    } catch (err) {
+      console.error("Error fetching reviews", err);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!token || !user) return alert("Please log in to post a review.");
+    if (!rating || rating < 1 || rating > 5) return alert("Rating must be between 1 and 5.");
+    if (!comment.trim()) return alert("Please write a comment.");
+
+    try {
+      setIsLoading(true);
+
+      const formData = new FormData();
+      formData.append("destination_id", id);
+      formData.append("rating", rating);
+      formData.append("comment", comment.trim());
+
+      await axios.post(
+        `http://localhost:5001/review/upload/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setComment("");
+      setRating(0);
+      fetchReviews();
+    } catch (err) {
+      console.error("Failed to upload review", err);
+      alert("Failed to post review: " + (err.response?.data?.["{!}"] || err.message));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (reviewId) => {
+    if (!window.confirm("Delete this review?")) return;
+
+    try {
+      await axios.delete(`http://localhost:5001/review/delete/${reviewId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchReviews();
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Failed to delete review.");
+    }
+  };
+
+  useEffect(() => {
+    if (id) fetchReviews();
+  }, [id]);
+
+  return (
+    <div className="p-4">
+      <h2 className="text-lg font-bold mb-2">User Reviews</h2>
+
+      {!token || !user ? (
+        <div className="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+          Please log in to post a review.
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="mb-4">
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="w-full p-2 border rounded mb-2"
+            placeholder="Write a comment"
+            required
+            disabled={isLoading}
+          />
+          <StarRating rating={rating} setRating={setRating} />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`px-4 py-2 rounded text-white ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              }`}
+          >
+            {isLoading ? "Posting..." : "Post Review"}
+          </button>
+        </form>
+      )}
+
+      {reviews.length === 0 ? (
+        <p>No reviews yet.</p>
+      ) : (
+        <ul className="space-y-3">
+          {reviews.map((review) => (
+            <li key={review.review_id} className="border p-3 rounded bg-gray-100">
+              <div className="font-semibold">{review.reviewer}</div>
+              <div className="text-sm text-yellow-500">Rating: {review.rating}/5</div>
+              <div className="italic">{review.comment}</div>
+              <div className="text-xs text-gray-500">
+                {new Date(review.created_at).toLocaleString()}
+              </div>
+
+              {token && user?.username === review.reviewer && (
+                <button
+                  onClick={() => handleDelete(review.review_id)}
+                  className="text-red-600 text-sm mt-1 hover:text-red-800"
+                >
+                  Delete
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

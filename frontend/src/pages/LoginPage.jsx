@@ -31,7 +31,7 @@ const LoginPage = () => {
                     token: data.token,
                 };
 
-                login(userData); // Set context
+                login(userData, data.token); // Set context
                 navigate('/profile');
             } else {
                 alert(data?.['{-}'] || data?.message || 'Login gagal.');
