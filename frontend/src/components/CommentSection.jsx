@@ -15,15 +15,13 @@ const StarRating = ({ rating, setRating }) => {
           <div key={i} className="relative w-6 h-6 text-yellow-400 cursor-pointer">
             <span
               onClick={() => handleClick(half)}
-              className={`absolute left-0 w-1/2 overflow-hidden ${rating >= half ? "text-yellow-400" : "text-gray-300"
-                }`}
+              className={`absolute left-0 w-1/2 overflow-hidden ${rating >= half ? "text-yellow-400" : "text-gray-300"}`}
             >
               ★
             </span>
             <span
               onClick={() => handleClick(full)}
-              className={`absolute left-0 w-full ${rating >= full ? "text-yellow-400" : "text-gray-300"
-                }`}
+              className={`absolute left-0 w-full ${rating >= full ? "text-yellow-400" : "text-gray-300"}`}
             >
               ★
             </span>
@@ -42,6 +40,7 @@ const CommentSection = () => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState(null);
 
   const fetchReviews = async () => {
     try {
@@ -58,30 +57,32 @@ const CommentSection = () => {
     if (!rating || rating < 1 || rating > 5) return alert("Rating must be between 1 and 5.");
     if (!comment.trim()) return alert("Please write a comment.");
 
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-
       const formData = new FormData();
       formData.append("destination_id", id);
       formData.append("rating", rating);
       formData.append("comment", comment.trim());
 
-      await axios.post(
-        `http://localhost:5001/review/upload/${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (editingReviewId) {
+        // Update existing review
+        await axios.put(`http://localhost:5001/review/update/${editingReviewId}`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        // New review
+        await axios.post(`http://localhost:5001/review/upload/${id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
 
       setComment("");
       setRating(0);
+      setEditingReviewId(null);
       fetchReviews();
     } catch (err) {
-      console.error("Failed to upload review", err);
-      alert("Failed to post review: " + (err.response?.data?.["{!}"] || err.message));
+      console.error("Failed to post/update review", err);
+      alert("Error: " + (err.response?.data?.["{!}"] || err.message));
     } finally {
       setIsLoading(false);
     }
@@ -89,18 +90,21 @@ const CommentSection = () => {
 
   const handleDelete = async (reviewId) => {
     if (!window.confirm("Delete this review?")) return;
-
     try {
       await axios.delete(`http://localhost:5001/review/${reviewId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       fetchReviews();
     } catch (err) {
       console.error("Delete failed", err);
       alert("Failed to delete review.");
     }
+  };
+
+  const handleEdit = (review) => {
+    setComment(review.comment);
+    setRating(review.rating);
+    setEditingReviewId(review.review_id);
   };
 
   useEffect(() => {
@@ -129,11 +133,23 @@ const CommentSection = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-4 py-2 rounded text-white ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-              }`}
+            className={`px-4 py-2 rounded text-white ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
           >
-            {isLoading ? "Posting..." : "Post Review"}
+            {isLoading ? "Submitting..." : editingReviewId ? "Update Review" : "Post Review"}
           </button>
+          {editingReviewId && (
+            <button
+              type="button"
+              onClick={() => {
+                setComment("");
+                setRating(0);
+                setEditingReviewId(null);
+              }}
+              className="ml-2 px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          )}
         </form>
       )}
 
@@ -149,14 +165,21 @@ const CommentSection = () => {
               <div className="text-xs text-gray-500">
                 {new Date(review.created_at).toLocaleString()}
               </div>
-
               {token && user?.username === review.reviewer && (
-                <button
-                  onClick={() => handleDelete(review.review_id)}
-                  className="text-red-600 text-sm mt-1 hover:text-red-800"
-                >
-                  Delete
-                </button>
+                <div className="flex gap-3 mt-1">
+                  <button
+                    onClick={() => handleEdit(review)}
+                    className="text-blue-600 text-sm hover:text-blue-800"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(review.review_id)}
+                    className="text-red-600 text-sm hover:text-red-800"
+                  >
+                    Delete
+                  </button>
+                </div>
               )}
             </li>
           ))}

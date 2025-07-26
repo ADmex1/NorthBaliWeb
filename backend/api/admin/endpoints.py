@@ -44,6 +44,22 @@ def recent_reviews(current_user):
     except mysql.connector.Error as e:
         return jsonify({"ERR": str(e)}),500
     
+@admin_endpoints.route('/destination-total', methods=['GET'])
+@token_required
+@admin_required
+def destination_total(current_user):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT COUNT(*) AS total FROM destination")
+        total = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Total destinations retrieved successfully", "total": total['total']}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
 
 @admin_endpoints.route('/destination-data', methods=['GET'])
 @token_required
@@ -61,3 +77,5 @@ def destination_data(current_user):
         return jsonify({"message": "Destination data retrieved successfully", "destinations": destinations}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+
