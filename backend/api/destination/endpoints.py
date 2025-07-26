@@ -76,7 +76,7 @@ def get_destination_by_id(destination_id):
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500
     
-    
+
 @destination_endpoints.route('/upload', methods=['POST'])
 @token_required
 @admin_required
@@ -263,6 +263,27 @@ def get_destination_reviews(destination_id):
             return jsonify({"{!}": "No reviews found for this destination"}), 404
 
         return jsonify({"Reviews": reviews}), 200
+
+    except mysql.connector.Error as e:
+        return jsonify({"{-} Error": str(e)}), 500
+    
+@destination_endpoints.route('/review-average/<int:destination_id>', methods=['GET'])
+def get_average_rating(destination_id):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT AVG(rating) AS average_rating, COUNT(*) AS total_reviews FROM review WHERE destination_id = %s", (destination_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not result or result['total_reviews'] == 0:
+            return jsonify({"{!}": "No reviews found for this destination"}), 404
+
+        average_rating = round(result['average_rating'], 2)
+        total_reviews = result['total_reviews']
+
+        return jsonify({"Average Rating": average_rating, "Total Reviews": total_reviews}), 200
 
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500

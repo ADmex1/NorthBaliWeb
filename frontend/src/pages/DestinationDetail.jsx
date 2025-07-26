@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Star, Clock, Tag, Navigation, ArrowLeft, ChevronLeft, ChevronRight, Youtube, MessageCircle, ChevronDown } from 'lucide-react';
+import {
+  MapPin, Star, Clock, Tag, Navigation, ArrowLeft, ChevronLeft,
+  ChevronRight, Youtube, MessageCircle, ChevronDown
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import CommentSection from '../components/CommentSection';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-
 
 const DestinationDetail = () => {
   const { id } = useParams();
@@ -13,6 +15,8 @@ const DestinationDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
+  const [averageRating, setAverageRating] = useState(null);
+  const [totalReviews, setTotalReviews] = useState(null);
   const { user, token } = useAuth();
 
   useEffect(() => {
@@ -28,7 +32,22 @@ const DestinationDetail = () => {
       }
     };
 
-    fetchDestination();
+    const fetchAverageRating = async () => {
+      try {
+        const res = await axios.get(`http://127.0.0.1:5001/review/rating-average/${id}`);
+        setAverageRating(res.data["Average Rating"]);
+        setTotalReviews(res.data["Total Reviews"]);
+      } catch (error) {
+        console.warn("No ratings found or failed to fetch average rating.");
+        setAverageRating(null);
+        setTotalReviews(0);
+      }
+    };
+
+    if (id) {
+      fetchDestination();
+      fetchAverageRating();
+    }
   }, [id]);
 
   const nextImage = () => {
@@ -87,10 +106,31 @@ const DestinationDetail = () => {
               <p className="text-gray-700 leading-relaxed">{destination.description}</p>
 
               <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div className="bg-gray-50 p-4 rounded-lg"><Star className="mx-auto w-6 h-6 text-amber-500 mb-2" /><h4 className="font-semibold text-gray-800">Rating</h4><p className="text-gray-600 text-sm">{destination.rating} / 5.0</p></div>
-                <div className="bg-gray-50 p-4 rounded-lg"><Clock className="mx-auto w-6 h-6 text-cyan-500 mb-2" /><h4 className="font-semibold text-gray-800">Waktu Terbaik</h4><p className="text-gray-600 text-sm">{destination.best_time_start} - {destination.best_time_end}</p></div>
-                <div className="bg-gray-50 p-4 rounded-lg"><Tag className="mx-auto w-6 h-6 text-lime-500 mb-2" /><h4 className="font-semibold text-gray-800">Kategori</h4><p className="text-gray-600 text-sm">{destination.category}</p></div>
-                <a href={destination.gmaps_url} target="_blank" rel="noopener noreferrer" className="bg-blue-50 hover:bg-blue-100 p-4 rounded-lg transition-colors"><Navigation className="mx-auto w-6 h-6 text-blue-600 mb-2" /><h4 className="font-semibold text-gray-800">Lihat Peta</h4><p className="text-gray-600 text-sm">Arahkan</p></a>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <Star className="mx-auto w-6 h-6 text-amber-500 mb-2" />
+                  <h4 className="font-semibold text-gray-800">Rating</h4>
+                  <p className="text-gray-600 text-sm">
+                    {averageRating !== null ? `${averageRating} / 5.0 (${totalReviews} ulasan)` : "Belum ada ulasan"}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <Clock className="mx-auto w-6 h-6 text-cyan-500 mb-2" />
+                  <h4 className="font-semibold text-gray-800">Waktu Terbaik</h4>
+                  <p className="text-gray-600 text-sm">{destination.best_time_start} - {destination.best_time_end}</p>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <Tag className="mx-auto w-6 h-6 text-lime-500 mb-2" />
+                  <h4 className="font-semibold text-gray-800">Kategori</h4>
+                  <p className="text-gray-600 text-sm">{destination.category}</p>
+                </div>
+
+                <a href={destination.gmaps_url} target="_blank" rel="noopener noreferrer" className="bg-blue-50 hover:bg-blue-100 p-4 rounded-lg transition-colors">
+                  <Navigation className="mx-auto w-6 h-6 text-blue-600 mb-2" />
+                  <h4 className="font-semibold text-gray-800">Lihat Peta</h4>
+                  <p className="text-gray-600 text-sm">Arahkan</p>
+                </a>
               </div>
 
               {/* Highlights */}
@@ -110,7 +150,7 @@ const DestinationDetail = () => {
                 <div className="mt-8">
                   <div className="flex items-center gap-3 mb-4">
                     <Youtube className="w-8 h-8 text-red-600" />
-                    <h3 cl assName="text-xl font-bold text-gray-800">Video Tur</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Video Tur</h3>
                   </div>
                   <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
                     <iframe
@@ -124,9 +164,10 @@ const DestinationDetail = () => {
                   </div>
                 </div>
               )}
+
               {/* Google Maps Link */}
               {destination.name && (
-                <div className="mb-6">
+                <div className="mb-6 mt-6">
                   <h3 className="font-semibold text-gray-800 mb-2">Peta Lokasi:</h3>
                   <div className="w-full h-[400px] rounded-lg overflow-hidden">
                     <iframe
@@ -172,7 +213,6 @@ const DestinationDetail = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-
               </div>
             </div>
           </div>

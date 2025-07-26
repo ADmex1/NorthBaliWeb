@@ -160,7 +160,7 @@ const CommentSection = () => {
           {reviews.map((review) => (
             <li key={review.review_id} className="border p-3 rounded bg-gray-100">
               <div className="font-semibold">{review.reviewer}</div>
-              <div className="text-sm text-yellow-500">Rating: {review.rating}/5</div>
+              <StarRating rating={review.rating} />
               <div className="italic">{review.comment}</div>
               <div className="text-xs text-gray-500">
                 {new Date(review.created_at).toLocaleString()}
