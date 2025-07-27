@@ -6,11 +6,10 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token') || '');
 
-    // Fetch full user info including profile_image
     useEffect(() => {
         const fetchUser = async () => {
             const savedToken = localStorage.getItem('token');
@@ -43,22 +42,21 @@ const AuthProvider = ({ children }) => {
             const authUser = {
                 username: decoded.username,
                 email: decoded.email,
-                isAdmin: decoded.email === 'admin@wisata.com',
+                isAdmin: decoded.email === 'ADmex1@gmail.com',
             };
             setUser(authUser);
             setToken(token);
             localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(authUser)); // ✅ SIMPAN USER
         } catch (e) {
             console.error('Error decoding token during login:', e);
         }
     };
-
     const logout = () => {
         setUser(null);
         setToken('');
         localStorage.removeItem('token');
-        auth.logout();
-        window.location.href = '/login'; // Redirect to login
+        window.location.href = '/login';
     };
 
     const updateUser = (userData) => {
@@ -74,5 +72,3 @@ const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-export default AuthProvider;

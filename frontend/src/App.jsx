@@ -13,9 +13,10 @@ import PageTransition from './components/PageTransition.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
-import AuthProvider from './context/AuthContext.jsx'; // <-- PASTIKAN IMPOR SEPERTI INI
+import { AuthProvider } from './context/AuthContext.jsx'; // <-- PASTIKAN IMPOR SEPERTI INI
 import AdminDashboard from './pages/AdminDashboard.jsx'; // Impor dashboard admin jika ada
 import Forbidden403 from './components/Forbidden403.jsx'; // Impor komponen Forbidden403
+
 function App() {
   const location = useLocation();
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
-const DestinationCreate = () => {
+const DestinationEdit = () => {
     const { token } = useAuth();
     const [form, setForm] = useState({
         name: '',
