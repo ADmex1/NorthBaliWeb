@@ -1,6 +1,5 @@
 // components/admin/RecentReviews.jsx
 import React, { useEffect, useState } from 'react';
-import { fetchRecentReviews } from '../utils/adminApi';
 
 const RecentReview = () => {
     const [reviews, setReviews] = useState([]);

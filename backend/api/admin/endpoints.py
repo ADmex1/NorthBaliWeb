@@ -19,7 +19,7 @@ def user_data(current_user):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT id, email, username, role FROM users")
+        cursor.execute("SELECT id, email, username, role, profile_image FROM users")
         users = cursor.fetchall()
 
         cursor.close()
@@ -69,7 +69,7 @@ def destination_data(current_user):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM destination")
+        cursor.execute("SELECT `name` FROM destination")
         destinations = cursor.fetchall()
 
         cursor.close()

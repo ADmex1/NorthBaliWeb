@@ -64,4 +64,4 @@ const DestinationCreate = () => {
     );
 };
 
-export default DestinationCreate;
+export default DestinationEdit;
