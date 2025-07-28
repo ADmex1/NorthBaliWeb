@@ -9,14 +9,14 @@ from api.userreview.endpoints import userreview_endpoints
 from api.destination.endpoints import destination_endpoints
 from api.admin.endpoints import admin_endpoints
 from api.user.endpoints import user_endpoints
-from flask_cors import CORS
+
 import os
 import datetime
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app)
 Swagger(app)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey')
 

@@ -88,7 +88,11 @@ const DestinationDetail = () => {
             <div className="relative w-full h-64 md:h-96 group">
               <img
                 key={currentImageIndex}
-                src={`http://127.0.0.1:5001${destination.image[currentImageIndex]}`}
+                src={
+                  destination.image?.[currentImageIndex]
+                    ? `http://127.0.0.1:5001${destination.image[currentImageIndex]}`
+                    : '/default.jpg'
+                }
                 alt={`${destination.name} ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover"
               />

@@ -1,113 +1,133 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { destinations } from '../data/destinations.js';
-import {
-    LayoutDashboard,
-    MapPin,
-    Users,
-    MessageSquare,
-    Eye,
-    Edit,
-    Trash2,
-    PlusCircle,
-    LogOut
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, MapPin, Users, MessageSquare, Plus, Trash2, Edit } from 'lucide-react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-// Komponen Kartu Statistik
 const StatCard = ({ icon, title, value, color }) => (
-    <div className={`bg-white p-6 rounded-xl shadow-lg border-l-4 ${color}`}>
-        <div className="flex items-center">
-            <div className="mr-4">{icon}</div>
+    <div className={`border rounded-2xl shadow-md p-4 ${color} w-full sm:w-1/2 md:w-1/4 m-2`}>
+        <div className="flex items-center space-x-4">
+            {icon}
             <div>
-                <p className="text-sm text-gray-500 font-medium">{title}</p>
-                <p className="text-2xl font-bold text-gray-800">{value}</p>
+                <div className="text-sm text-gray-500">{title}</div>
+                <div className="text-xl font-semibold">{value}</div>
             </div>
         </div>
     </div>
 );
 
 const AdminDashboard = () => {
-    const [destinationList, setDestinationList] = useState(destinations);
-    const { user, logout } = useAuth();
+    const { token, user } = useAuth();
+    const [users, setUsers] = useState([]);
+    const [recentReviews, setRecentReviews] = useState([]);
+    const [destinations, setDestinations] = useState([]);
     const navigate = useNavigate();
+    const isAdmin = true; // Replace with actual admin check logic
+    useEffect(() => {
+        const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    if (!user || !user.isAdmin) {
-        return <Navigate to="/403" replace />;
-    }
+        const fetchData = async () => {
+            try {
+                const userRes = await axios.get('http://localhost:5001/admin/user-data', config);
+                setUsers(userRes.data.users);
 
-    const handleDelete = (id) => {
-        if (window.confirm('Apakah Anda yakin ingin menghapus destinasi ini?')) {
-            setDestinationList(destinationList.filter(dest => dest.id !== id));
+                const reviewRes = await axios.get('http://localhost:5001/admin/recent-reviews', config);
+                setRecentReviews(reviewRes.data.reviews);
+
+                const destinationRes = await axios.get('http://localhost:5001/destination/destination-list');
+                setDestinations(destinationRes.data);
+            } catch (err) {
+                console.error("Error fetching dashboard data:", err);
+            }
+        };
+
+        fetchData();
+    }, [token]);
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this destination?")) return;
+
+        try {
+            await axios.delete(`http://localhost:5001/destination/delete/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setDestinations(prev => prev.filter(dest => dest.id !== id));
+        } catch (err) {
+            console.error("Delete error:", err);
         }
     };
-
-    const handleLogout = () => {
-        logout();
-        navigate('/');
-    };
-
+    if (!isAdmin) {
+        return <Forbidden403 />;
+    }
     return (
-        <div className="p-8 sm:p-12 bg-gray-50 min-h-screen">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                    <LayoutDashboard />
-                    Admin Dashboard
-                </h1>
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-                >
-                    <LogOut size={18} />
-                    Logout
-                </button>
+        <div className="p-4">
+            <h1 className="text-2xl font-bold mb-6 flex items-center">
+                <LayoutDashboard className="mr-2" /> Admin Dashboard
+            </h1>
+
+            <div className="flex flex-wrap">
+                <StatCard icon={<MapPin size={32} className="text-blue-500" />} title="Total Destinasi" value={destinations.length} color="border-blue-500" />
+                <StatCard icon={<Users size={32} className="text-green-500" />} title="Total Pengguna" value={users.length} color="border-green-500" />
+                <StatCard icon={<MessageSquare size={32} className="text-yellow-500" />} title="Total Review Terbaru" value={recentReviews.length} color="border-yellow-500" />
             </div>
 
-            {/* Statistik */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <StatCard icon={<MapPin size={32} className="text-blue-500" />} title="Total Destinasi" value={destinationList.length} color="border-blue-500" />
-                <StatCard icon={<Users size={32} className="text-green-500" />} title="Pengguna Terdaftar" value="1,250" color="border-green-500" />
-                <StatCard icon={<MessageSquare size={32} className="text-yellow-500" />} title="Total Ulasan" value="849" color="border-yellow-500" />
-                <StatCard icon={<Eye size={32} className="text-purple-500" />} title="Paling Dilihat" value="Pantai Lovina" color="border-purple-500" />
+            <div className="mt-6">
+                <h2 className="text-lg font-bold mb-2">5 Review Terbaru:</h2>
+                <ul className="list-disc ml-5">
+                    {recentReviews.map((review, idx) => (
+                        <li key={idx}><strong>{review.username || 'User'}:</strong> {review.comment}</li>
+                    ))}
+                </ul>
             </div>
 
-            {/* Manajemen Destinasi */}
-            <div>
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Manajemen Destinasi</h2>
-                    <Link to="/admin/create" className="bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 flex items-center gap-2">
-                        <PlusCircle size={18} />
-                        Buat Destinasi Baru
-                    </Link>
+            <div className="mt-10">
+                <div className="flex justify-between items-center mb-3">
+                    <h2 className="text-xl font-bold">Daftar Destinasi:</h2>
+                    <button onClick={() => navigate('/admin/create')} className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700">
+                        <Plus size={18} className="mr-1" /> Tambah Destinasi
+                    </button>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left bg-white rounded-lg">
+                        <thead className="bg-gray-100 text-gray-700 uppercase">
                             <tr>
-                                <th className="px-6 py-3">Nama Destinasi</th>
-                                <th className="px-6 py-3">Kategori</th>
-                                <th className="px-6 py-3">Lokasi</th>
-                                <th className="px-6 py-3 text-center">Aksi</th>
+                                <th className="px-4 py-2">Nama</th>
+                                <th className="px-4 py-2">Lokasi</th>
+                                <th className="px-4 py-2">Kategori</th>
+                                <th className="px-4 py-2">Rating</th>
+                                <th className="px-4 py-2">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {destinationList.map(dest => (
-                                <tr key={dest.id} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4 font-medium text-gray-900">{dest.name}</td>
-                                    <td className="px-6 py-4">{dest.category}</td>
-                                    <td className="px-6 py-4">{dest.location}</td>
-                                    <td className="px-6 py-4 text-center">
-                                        <div className="flex justify-center gap-4">
-                                            <button className="font-medium text-blue-600 hover:underline">
+                            {destinations.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-4 text-gray-500">No destinations available.</td>
+                                </tr>
+                            ) : (
+                                destinations.map((dest) => (
+                                    <tr key={dest.id} className="border-t">
+                                        <td className="px-4 py-2">{dest.name}</td>
+                                        <td className="px-4 py-2">{dest.location}</td>
+                                        <td className="px-4 py-2">{dest.category}</td>
+                                        <td className="px-4 py-2">{dest.rating}</td>
+                                        <td className="px-4 py-2 flex gap-2">
+                                            <button
+                                                onClick={() => navigate(`/admin/edit/${dest.id}`)}
+                                                className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                                            >
                                                 <Edit size={16} />
                                             </button>
-                                            <button onClick={() => handleDelete(dest.id)} className="font-medium text-red-600 hover:underline">
+                                            <button
+                                                onClick={() => handleDelete(dest.id)}
+                                                className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                                            >
                                                 <Trash2 size={16} />
                                             </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

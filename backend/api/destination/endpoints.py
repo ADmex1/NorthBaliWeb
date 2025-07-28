@@ -76,7 +76,6 @@ def get_destination_by_id(destination_id):
     except mysql.connector.Error as e:
         return jsonify({"{-} Error": str(e)}), 500
     
-
 @destination_endpoints.route('/upload', methods=['POST'])
 @token_required
 @admin_required
@@ -90,17 +89,21 @@ def upload_destination(current_user):
         best_time_range = request.form.get("bestTime", "")
         gmaps_url = request.form.get("gmapsUrl")
         youtube_id = request.form.get('youtube_id', "")
-        youtube_id =        f"https://www.youtube.com/watch?v={youtube_id}" if youtube_id else None
+        youtube_id = f"https://www.youtube.com/watch?v={youtube_id}" if youtube_id else None
 
         highlights_list = request.form.getlist("highlights")
         highlights_json = json.dumps(highlights_list)
 
+        # === Best Time Parsing ===
         best_time_range = best_time_range.replace("WITA", "").strip()
         try:
-            best_time_start, best_time_end = [t.strip() for t in best_time_range.split(" - ")]
+            best_time_start_str, best_time_end_str = [t.strip() for t in best_time_range.split(" - ")]
+            best_time_start = datetime.strptime(best_time_start_str, "%H:%M").time()
+            best_time_end = datetime.strptime(best_time_end_str, "%H:%M").time()
         except ValueError:
-            return jsonify({"error": "bestTime format must be 'HH:MM - HH:MM [WITA]'"}), 400
+            return jsonify({"error": "bestTime format must be 'HH:MM - HH:MM WITA'"}), 400
 
+        # === Image Processing ===
         image_files = request.files.getlist("image")
         if not image_files:
             return jsonify({"{-}": "The file has to be image format"}), 400
@@ -115,6 +118,7 @@ def upload_destination(current_user):
 
         image_json = json.dumps(image_urls)
 
+        # === Database Insert ===
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
@@ -136,42 +140,36 @@ def upload_destination(current_user):
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
 
-
 @destination_endpoints.route('/update/<int:destination_id>', methods=['PUT'])
 @token_required
 @admin_required
 def update_destination(current_user, destination_id):
     try:
         data = request.form
+        image_files = request.files.getlist("image")
 
-        required_fields = ["name", "location", "category", "description", "image", "rating", "bestTime", "highlights", "gmapsUrl", "youtube_id"]
-        for field in required_fields:
-            if field not in data:
-                return jsonify({"{-} Error": f"{field} is required"}), 400
+        if not data.get("name") or not image_files:
+            return jsonify({"{-} Error": "name and image are required"}), 400
 
-        name = data["name"]
-        location = data["location"]
-        category = data["category"]
-        description = data["description"]
-        image_urls = json.dumps(data["image"])
-        rating = float(data["rating"])
-        highlights = json.dumps(data.get("highlights", []))
-        best_time_range = data.get("bestTime", "")
-        gmaps_url = data.get("gmapsUrl", "")
-        youtube_raw = data.get("youtube_id") or data.get("youtubeId")
-        youtube_id = f"https://www.youtube.com/watch?v={request.form.get('youtube_id')}" if request.form.get("youtube_id") else None
+        image_filenames = []
+        for img in image_files:
+            if img.filename:
+                filename = secure_filename(img.filename)
+                img.save(os.path.join(upload_folder, filename))
+                image_filenames.append(filename)
 
-        best_time_range = best_time_range.replace("WITA", "").strip()
+        image_urls = json.dumps(image_filenames)
+        highlights = data.getlist("highlights")
+
+        best_time = data.get("bestTime", "")
         try:
-            best_time_start, best_time_end = best_time_range.split(" - ")
-            best_time_start = best_time_start.strip()
-            best_time_end = best_time_end.strip()
+            best_time_start, best_time_end = best_time.replace("WITA", "").strip().split(" - ")
         except ValueError:
-            return jsonify({"{-} Error": "bestTime format must be 'HH:MM - HH:MM [WITA]'"}), 400
+            return jsonify({"{-} Error": "bestTime format must be 'HH:MM - HH:MM'"}), 400
 
         conn = get_connection()
         cursor = conn.cursor()
-        query = """
+        cursor.execute("""
             UPDATE destination SET
                 name = %s,
                 location = %s,
@@ -186,19 +184,18 @@ def update_destination(current_user, destination_id):
                 youtube_id = %s,
                 admin_id = %s
             WHERE id = %s
-        """
-        cursor.execute(query, (
-            name,
-            location,
-            category,
-            description,
+        """, (
+            data.get("name"),
+            data.get("location"),
+            data.get("category"),
+            data.get("description"),
             image_urls,
-            rating,
-            highlights,
-            best_time_start,
-            best_time_end,
-            gmaps_url,
-            youtube_id,
+            float(data.get("rating")),
+            json.dumps(highlights),
+            best_time_start.strip(),
+            best_time_end.strip(),
+            data.get("gmapsUrl"),
+            f"https://www.youtube.com/watch?v={data.get('youtube_id')}",
             current_user['id'],
             destination_id
         ))
@@ -210,7 +207,6 @@ def update_destination(current_user, destination_id):
 
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
-    
 
     
 @destination_endpoints.route('/delete/<int:destination_id>', methods=['DELETE'])

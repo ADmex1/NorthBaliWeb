@@ -91,7 +91,7 @@ const CommentSection = () => {
   const handleDelete = async (reviewId) => {
     if (!window.confirm("Delete this review?")) return;
     try {
-      await axios.delete(`http://localhost:5001/review/${reviewId}`, {
+      await axios.delete(`http://localhost:5001/review/delete/${reviewId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchReviews();

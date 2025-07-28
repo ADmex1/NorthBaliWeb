@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
                 const userData = res.data;
                 setUser({
                     ...userData,
-                    isAdmin: userData.email === 'admin@wisata.com',
+                    isAdmin: userData.email === 'ADmex1@gmail.com',
                 });
             } catch (err) {
                 console.error("Failed to fetch user:", err);
@@ -47,11 +47,12 @@ export const AuthProvider = ({ children }) => {
             setUser(authUser);
             setToken(token);
             localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(authUser)); // ✅ SIMPAN USER
+            localStorage.setItem('user', JSON.stringify(authUser));
         } catch (e) {
             console.error('Error decoding token during login:', e);
         }
     };
+
     const logout = () => {
         setUser(null);
         setToken('');

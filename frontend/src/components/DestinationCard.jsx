@@ -21,7 +21,10 @@ const DestinationCard = ({ destination }) => {
       });
   }, [destination.id]);
 
-  const imageUrl = `http://127.0.0.1:5001/${destination.image?.[0] || 'default.jpg'}`;
+  const imageUrl = destination.image?.[0]
+    ? `http://127.0.0.1:5001/${destination.image[0]}`
+    : '/default.jpg'; // your local fallback image
+
 
   return (
     <Link
