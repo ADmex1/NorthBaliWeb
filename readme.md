@@ -2,8 +2,8 @@
 
 A full-stack web application for discovering and managing sport tourism spots across **North Bali**. Built using **Flask** for the backend and **React** for the frontend. Users can explore destinations, leave reviews, and admins can upload and manage destination data.
 
-This project was made for fun and practice in full-stack development.
-
+This project was made for fun and practice for full-stack development.
+(Note: There are several bugs that are located on the frontend).
 ---
 
 ## Project Structure
