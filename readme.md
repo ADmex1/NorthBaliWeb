@@ -53,7 +53,7 @@ This project was made for fun and practice for full-stack development.
 - Flask
 - Flask-JWT-Extended
 - Flask-CORS
-- SQLAlchemy + MySQL
+- MySQL + MySQL.connector
 - Werkzeug for file uploads
 
 ---
