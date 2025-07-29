@@ -71,7 +71,7 @@ This project was made for fun and practice for full-stack development.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/northbaliweb.git
+https://github.com/ADmex1/NorthBaliWeb.git
 cd northbaliweb
 ```
 ### 2. Flask Setup
