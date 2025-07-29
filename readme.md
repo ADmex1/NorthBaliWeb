@@ -5,7 +5,9 @@ A full-stack web application for discovering and managing sport tourism spots ac
 This project was made for fun and practice for full-stack development.
 (Note: There are several bugs that are located on the frontend).
 ---
-
+![Alt Text](assets/dest.png)
+![Alt Text](assets/frontpage.png)
+![Alt Text](assets/login.png)
 ## Project Structure
 ```bash
 ├── backend/ 
