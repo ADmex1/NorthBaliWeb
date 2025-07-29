@@ -7,9 +7,8 @@ This project was made for fun and practice for full-stack development.
 ---
 
 ### Website Preview
-
-![Alt Text](assets/dest.png)
 ![Alt Text](assets/frontpage.png)
+![Alt Text](assets/dest.png)
 ![Alt Text](assets/login.png)
 
 ---
