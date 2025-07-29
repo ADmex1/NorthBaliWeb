@@ -7,7 +7,7 @@ This project was made for fun and practice in full-stack development.
 ---
 
 ## Project Structure
-
+```bash
 ├── backend/ 
 │ ├── app.py
 │ ├── api
@@ -23,7 +23,7 @@ This project was made for fun and practice in full-stack development.
 │ ├── pages/
 │ └── context/AuthContext.js
 └── .env 
-
+```
 
 ##  Features
 
