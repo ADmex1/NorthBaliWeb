@@ -15,7 +15,16 @@ const ProfilePage = () => {
             </div>
         );
     }
-    return user.isAdmin ? <AdminDashboard /> : <UserProfile />;
-
+    if (user.isAdmin) {
+        return <AdminDashboard />; // Tampilkan dashboard admin jika pengguna adalah admin
+    }
+    else {
+        return (
+            <div className="max-w-screen-xl mx-auto bg-white shadow-xl p-8">
+                <h1 className="text-2xl font-bold mb-4">Profil Pengguna</h1>
+                <UserProfile user={user} />
+            </div>
+        );
+    }
 };
 export default ProfilePage;

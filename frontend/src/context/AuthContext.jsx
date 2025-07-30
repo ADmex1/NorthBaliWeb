@@ -1,75 +1,51 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
-
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token') || '');
+    const [token, setToken] = useState(null);
 
+    // ✅ Restore from localStorage on first load
     useEffect(() => {
-        const fetchUser = async () => {
-            const savedToken = localStorage.getItem('token');
-            if (!savedToken) return;
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
 
-            try {
-                const res = await axios.get("http://localhost:5001/user/me", {
-                    headers: {
-                        Authorization: `Bearer ${savedToken}`,
-                    },
-                });
-
-                const userData = res.data;
-                setUser({
-                    ...userData,
-                    isAdmin: userData.email === 'ADmex1@gmail.com',
-                });
-            } catch (err) {
-                console.error("Failed to fetch user:", err);
-                setUser(null);
-            }
-        };
-
-        fetchUser();
+        if (storedToken && storedUser) {
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+        }
     }, []);
 
     const login = (userData, token) => {
-        try {
-            const decoded = jwtDecode(token);
-            const authUser = {
-                username: decoded.username,
-                email: decoded.email,
-                isAdmin: decoded.email === 'ADmex1@gmail.com',
-            };
-            setUser(authUser);
-            setToken(token);
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(authUser));
-        } catch (e) {
-            console.error('Error decoding token during login:', e);
-        }
+        setUser({
+            id: userData.id,
+            username: userData.username,
+            email: userData.email,
+            isAdmin: userData.is_admin || userData.isAdmin, // works for both formats
+        });
+        setToken(token);
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({
+            id: userData.id,
+            username: userData.username,
+            email: userData.email,
+            isAdmin: userData.is_admin || userData.isAdmin,
+        }));
     };
 
     const logout = () => {
         setUser(null);
-        setToken('');
+        setToken(null);
         localStorage.removeItem('token');
-        window.location.href = '/login';
-    };
-
-    const updateUser = (userData) => {
-        setUser((prevUser) => ({
-            ...prevUser,
-            ...userData,
-        }));
+        localStorage.removeItem('user');
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ user, token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
+export const useAuth = () => useContext(AuthContext);

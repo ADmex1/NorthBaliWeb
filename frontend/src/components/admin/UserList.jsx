@@ -18,10 +18,10 @@ const UserList = () => {
         <div>
             <h2 className="text-xl font-bold mb-4">Users</h2>
             <table className="w-full">
-                <thead><tr><th>Email</th><th>Username</th><th>Role</th></tr></thead>
+                <thead><tr><th>Email</th><th>Username</th><th>is_admin</th></tr></thead>
                 <tbody>
                     {users.map(u => (
-                        <tr key={u.id}><td>{u.email}</td><td>{u.username}</td><td>{u.role}</td></tr>
+                        <tr key={u.id}><td>{u.email}</td><td>{u.username}</td><td>{u.is_admin}</td></tr>
                     ))}
                 </tbody>
             </table>

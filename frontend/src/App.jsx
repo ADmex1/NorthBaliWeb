@@ -13,13 +13,14 @@ import PageTransition from './components/PageTransition.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
-import { AuthProvider } from './context/AuthContext.jsx'; // <-- PASTIKAN IMPOR SEPERTI INI
-import AdminDashboard from './pages/AdminDashboard.jsx'; // Impor dashboard admin jika ada
+import { AuthProvider } from './context/AuthContext.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 import Forbidden403 from './components/Forbidden403.jsx'; // Impor komponen Forbidden403
 //import AdminCRUD from './pages/AdminCRUD.jsx'; // Impor halaman CRUD admin jika ada
 import DestinationForm from './components/admin/DestinationForm.jsx';
 import EditDestination from './components/admin/DestinationEdit.jsx'; // Impor komponen edit destinasi
 import DestinationCreate from './components/admin/DestinationCreate.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 function App() {
   const location = useLocation();
 
@@ -39,14 +40,14 @@ function App() {
               <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
               <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
               <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
-              <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
+              <Route path="/admindashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />
               <Route path="/403" element={<PageTransition><Forbidden403 /></PageTransition>} />
               {/* <Route path="/admin/create" element={<PageTransition><AdminCRUD /></PageTransition>} />
               <Route path="/admin/edit/:id" element={<PageTransition><AdminCRUD /></PageTransition>} /> */}
               {/* <Route path="/admin/edit/:id" element={<DestinationForm />} /> */}
               <Route path="/admin/create" element={<DestinationCreate />} />
               <Route path="/admin/edit/:id" element={<EditDestination />} />
-
+              <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
             </Routes>
           </AnimatePresence>
         </main>

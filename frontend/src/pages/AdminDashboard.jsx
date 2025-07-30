@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, MapPin, Users, MessageSquare, Plus, Trash2, Edit } from 'lucide-react';
+import {
+    LayoutDashboard,
+    MapPin,
+    Users,
+    MessageSquare,
+    Plus,
+    Trash2,
+    Edit,
+    LogOut
+} from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Forbidden403 from './403'; // make sure this exists
 
 const StatCard = ({ icon, title, value, color }) => (
     <div className={`border rounded-2xl shadow-md p-4 ${color} w-full sm:w-1/2 md:w-1/4 m-2`}>
@@ -17,17 +27,17 @@ const StatCard = ({ icon, title, value, color }) => (
 );
 
 const AdminDashboard = () => {
-    const { token, user } = useAuth();
+    const { token, user, loading } = useAuth();
     const [users, setUsers] = useState([]);
     const [recentReviews, setRecentReviews] = useState([]);
     const [destinations, setDestinations] = useState([]);
     const navigate = useNavigate();
-    const isAdmin = true; // Replace with actual admin check logic
-    useEffect(() => {
-        const config = { headers: { Authorization: `Bearer ${token}` } };
 
+    useEffect(() => {
         const fetchData = async () => {
             try {
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+
                 const userRes = await axios.get('http://localhost:5001/admin/user-data', config);
                 setUsers(userRes.data.users);
 
@@ -38,44 +48,88 @@ const AdminDashboard = () => {
                 setDestinations(destinationRes.data);
             } catch (err) {
                 console.error("Error fetching dashboard data:", err);
+                if (err.response?.status === 401 || err.response?.status === 403) {
+                    alert("Token expired or unauthorized access");
+                    navigate('/login');
+                }
             }
         };
 
-        fetchData();
-    }, [token]);
+        if (user?.isAdmin) {
+            fetchData();
+        }
+    }, [token, user]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    if (!user || !user.isAdmin) {
+        return <Forbidden403 />;
+    }
 
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this destination?")) return;
-
         try {
             await axios.delete(`http://localhost:5001/destination/delete/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setDestinations(prev => prev.filter(dest => dest.id !== id));
+            setDestinations((prev) => prev.filter((dest) => dest.id !== id));
         } catch (err) {
             console.error("Delete error:", err);
         }
     };
-    if (!isAdmin) {
-        return <Forbidden403 />;
-    }
+
     return (
         <div className="p-4">
+            <div className="flex justify-end">
+                <button
+                    onClick={() => {
+                        localStorage.removeItem('token');
+                        navigate('/login');
+                    }}
+                    className="text-red-600 flex items-center hover:underline"
+                >
+                    <LogOut className="mr-1" size={20} /> Log Out
+                </button>
+            </div>
+
             <h1 className="text-2xl font-bold mb-6 flex items-center">
                 <LayoutDashboard className="mr-2" /> Admin Dashboard
             </h1>
 
             <div className="flex flex-wrap">
-                <StatCard icon={<MapPin size={32} className="text-blue-500" />} title="Total Destinasi" value={destinations.length} color="border-blue-500" />
-                <StatCard icon={<Users size={32} className="text-green-500" />} title="Total Pengguna" value={users.length} color="border-green-500" />
-                <StatCard icon={<MessageSquare size={32} className="text-yellow-500" />} title="Total Review Terbaru" value={recentReviews.length} color="border-yellow-500" />
+                <StatCard
+                    icon={<MapPin size={32} className="text-blue-500" />}
+                    title="Total Destinasi"
+                    value={destinations.length}
+                    color="border-blue-500"
+                />
+                <StatCard
+                    icon={<Users size={32} className="text-green-500" />}
+                    title="Total Pengguna"
+                    value={users.length}
+                    color="border-green-500"
+                />
+                <StatCard
+                    icon={<MessageSquare size={32} className="text-yellow-500" />}
+                    title="Total Review Terbaru"
+                    value={recentReviews.length}
+                    color="border-yellow-500"
+                />
             </div>
 
             <div className="mt-6">
                 <h2 className="text-lg font-bold mb-2">5 Review Terbaru:</h2>
                 <ul className="list-disc ml-5">
                     {recentReviews.map((review, idx) => (
-                        <li key={idx}><strong>{review.username || 'User'}:</strong> {review.comment}</li>
+                        <li key={idx}>
+                            <strong>{review.username || 'User'}:</strong> {review.comment}
+                        </li>
                     ))}
                 </ul>
             </div>
@@ -83,7 +137,10 @@ const AdminDashboard = () => {
             <div className="mt-10">
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-xl font-bold">Daftar Destinasi:</h2>
-                    <button onClick={() => navigate('/admin/create')} className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700">
+                    <button
+                        onClick={() => navigate('/admin/create')}
+                        className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700"
+                    >
                         <Plus size={18} className="mr-1" /> Tambah Destinasi
                     </button>
                 </div>
@@ -102,7 +159,9 @@ const AdminDashboard = () => {
                         <tbody>
                             {destinations.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="text-center py-4 text-gray-500">No destinations available.</td>
+                                    <td colSpan="5" className="text-center py-4 text-gray-500">
+                                        No destinations available.
+                                    </td>
                                 </tr>
                             ) : (
                                 destinations.map((dest) => (

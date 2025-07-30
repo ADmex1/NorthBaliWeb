@@ -21,7 +21,7 @@ def admin_data(current_user):
         conn= get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT id, email, username, role FROM users")
+        cursor.execute("SELECT id, email, username, is_admin FROM users")
         users = cursor.fetchall()
 
         cursor.close()
