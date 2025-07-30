@@ -13,6 +13,7 @@ import {
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Forbidden403 from './403'; // make sure this exists
+import UserProfile from '../components/UserProfile';
 
 const StatCard = ({ icon, title, value, color }) => (
     <div className={`border rounded-2xl shadow-md p-4 ${color} w-full sm:w-1/2 md:w-1/4 m-2`}>
@@ -208,6 +209,11 @@ const AdminDashboard = () => {
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div className="mt-10">
+                <h2 className="text-xl font-bold mb-4">ADMIN PROFILE</h2>
+                <UserProfile />
+
             </div>
         </div>
     );
