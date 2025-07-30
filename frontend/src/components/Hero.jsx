@@ -3,14 +3,15 @@ import { Link } from 'react-scroll';
 
 const Hero = () => {
   return (
-    <section className="relative h-[60vh] md:h-[80vh] flex items-center justify-center text-white">
+    <section className="relative h-screen flex items-center justify-center text-white">
       <div className="absolute inset-0 z-0">
         <img
           src="home/bratan2.jpg"
           alt="Pura Ulun Danu Bratan"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-lg shadow-lg"
         />
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
+
       </div>
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-tight">
@@ -19,7 +20,7 @@ const Hero = () => {
         <p className="text-lg md:text-xl mb-8 font-light text-gray-200">
           Temukan keindahan alam yang otentik, mulai dari lumba-lumba di lautan hingga air terjun megah di pegunungan.
         </p>
-    
+
       </div>
     </section>
   );

@@ -11,7 +11,7 @@ const HomePage = () => {
         <>
             <Hero />
             <div className="max-w-screen-xl mx-auto bg-white shadow-xl">
-                
+
                 <Introduction />
 
                 <section id="why-north-bali" className="bg-white py-16 sm:py-24 border-t border-gray-200">
@@ -19,7 +19,7 @@ const HomePage = () => {
                         <div className="text-center mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Mengapa Memilih Bali Utara?</h2>
                             <p className="mt-4 text-lg text-gray-600">
-                                Bali Utara, yang mencakup kabupaten Buleleng dengan Singaraja sebagai ibu kotanya, menawarkan pengalaman wisata yang autentik dan berbeda dari hiruk-pikuk Bali Selatan yang sudah sangat komersial. 
+                                Bali Utara, yang mencakup kabupaten Buleleng dengan Singaraja sebagai ibu kotanya, menawarkan pengalaman wisata yang autentik dan berbeda dari hiruk-pikuk Bali Selatan yang sudah sangat komersial.
                                 Wilayah ini merupakan destinasi yang sempurna bagi wisatawan yang mencari ketenangan, keaslian budaya Bali, dan keindahan alam yang masih terjaga dengan baik.
                             </p>
                         </div>
