@@ -134,7 +134,7 @@ const UserProfile = () => {
                         <img
                             src={`http://localhost:5001/profileimage/${user?.profile_image || 'default.avif'}`}
                             alt="Profile"
-                            className="w-20 h-20 rounded-full object-cover mx-auto ring-2 ring-cyan-400"
+                            className="w-24 h-24 rounded-full object-cover mx-auto"
                         />
                         <p className="text-sm text-gray-400">{user?.username}</p>
                         <p className="text-sm text-gray-400">{user?.email}</p>

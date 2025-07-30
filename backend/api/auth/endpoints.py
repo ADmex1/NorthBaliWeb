@@ -160,3 +160,16 @@ def login():
 @token_required
 def logout(current_user):
     return jsonify({'{+}': 'User Logged Out'}), 200
+
+@auth_endpoint.route('/profile', methods=['GET'])
+@token_required
+def profile(current_user):
+    return jsonify({
+        'user': {
+            'id': current_user['id'],
+            'username': current_user['username'],
+            'email': current_user['email'],
+            'profile_image': current_user.get('profile_image'),
+            'is_admin': bool(current_user['is_admin'])
+        }
+    }), 200

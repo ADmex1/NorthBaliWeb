@@ -6,7 +6,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
 
-    // ✅ Restore from localStorage on first load
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
@@ -22,7 +21,8 @@ export const AuthProvider = ({ children }) => {
             id: userData.id,
             username: userData.username,
             email: userData.email,
-            isAdmin: userData.is_admin || userData.isAdmin, // works for both formats
+            isAdmin: userData.is_admin || userData.isAdmin,
+            profile_image: userData.profile_image || 'default.avif',
         });
         setToken(token);
         localStorage.setItem('token', token);
@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
             username: userData.username,
             email: userData.email,
             isAdmin: userData.is_admin || userData.isAdmin,
+            profile_image: userData.profile_image,
         }));
     };
 

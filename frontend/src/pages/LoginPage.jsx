@@ -25,23 +25,28 @@ const LoginPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                const decoded = jwtDecode(data.token);
+                const token = data.token;
 
-                const userData = {
-                    id: decoded.id,
-                    email: decoded.email,
-                    username: decoded.username,
-                    is_admin: decoded.is_admin,
-                    token: data.token,
-                };
+                // Fetch full profile after successful login
+                const profileRes = await fetch('http://localhost:5001/api/auth/profile', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-                login(userData, data.token);
-                if (userData.is_admin) {
+                if (!profileRes.ok) throw new Error('Gagal mengambil profil pengguna');
+
+                const profileData = await profileRes.json();
+                const user = profileData.user;
+
+                login(user, token);
+
+                if (user.is_admin) {
                     navigate('/admindashboard');
                 } else {
                     navigate('/profile');
                 }
-
             } else {
                 alert(data?.['{-}'] || data?.message || 'Login gagal.');
             }
