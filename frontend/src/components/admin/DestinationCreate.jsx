@@ -63,7 +63,7 @@ const DestinationCreate = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            navigate('/admin');
+            navigate('/admindashboard');
         } catch (err) {
             console.error('Upload failed:', err);
         }
