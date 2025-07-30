@@ -35,12 +35,27 @@ export const AuthProvider = ({ children }) => {
         }));
     };
 
-    const logout = () => {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-    };
+    const logout = async () => {
+        try {
+            await fetch('http://localhost:5001/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        }
+        catch (error) {
+            console.error('Logout error:', error);
+            alert('Failed to log out. Please try again.');
+        }
+        finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+            setToken(null);
+        }
+    }
 
     return (
         <AuthContext.Provider value={{ user, token, login, logout }}>

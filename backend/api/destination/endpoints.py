@@ -147,18 +147,28 @@ def update_destination(current_user, destination_id):
     try:
         data = request.form
         image_files = request.files.getlist("image")
+        replace_images = data.get("replace_images", "false").lower() == "true"
 
-        if not data.get("name") or not image_files:
-            return jsonify({"{-} Error": "name and image are required"}), 400
+        if not data.get("name"):
+            return jsonify({"{-} Error": "name is required"}), 400
+        conn = get_connection()
+        cursor = conn.cursor()
+        if replace_images:
+            if image_files and any(img.filename for img in image_files):
+                image_filenames = []
+                for img in image_files:
+                    if img.filename:
+                        filename = secure_filename(img.filename)
+                        img.save(os.path.join(upload_folder, filename))
+                        image_filenames.append(filename)
+                image_urls = json.dumps(image_filenames)
+            else:
+                image_urls = json.dumps([])
+        else:
+            cursor.execute("SELECT image FROM destination WHERE id = %s", (destination_id,))
+            result = cursor.fetchone()
+            image_urls = result['image'] if result else json.dumps([])
 
-        image_filenames = []
-        for img in image_files:
-            if img.filename:
-                filename = secure_filename(img.filename)
-                img.save(os.path.join(upload_folder, filename))
-                image_filenames.append(filename)
-
-        image_urls = json.dumps(image_filenames)
         highlights = data.getlist("highlights")
 
         best_time = data.get("bestTime", "")
@@ -166,9 +176,6 @@ def update_destination(current_user, destination_id):
             best_time_start, best_time_end = best_time.replace("WITA", "").strip().split(" - ")
         except ValueError:
             return jsonify({"{-} Error": "bestTime format must be 'HH:MM - HH:MM'"}), 400
-
-        conn = get_connection()
-        cursor = conn.cursor()
         cursor.execute("""
             UPDATE destination SET
                 name = %s,
@@ -202,9 +209,9 @@ def update_destination(current_user, destination_id):
         conn.commit()
         cursor.close()
         conn.close()
-
-        return jsonify({"{+} Success": "Updated"}), 200
-
+        return jsonify({"{+} Success": "Destination updated"}), 200
+    except Exception as e:
+        return jsonify({"{-} Error": str(e)}), 500
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
 

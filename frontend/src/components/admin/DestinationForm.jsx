@@ -100,7 +100,7 @@ const DestinationForm = () => {
         });
         alert("Destination created!");
       }
-      navigate("/admin");
+      navigate("/admindashboard");
     } catch (err) {
       console.error("Submit failed", err);
       alert("Error submitting form");

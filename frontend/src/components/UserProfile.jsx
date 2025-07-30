@@ -18,7 +18,7 @@ const UserProfile = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/');
+        navigate('/login');
     };
     // const getFilename = (path) => {
     //     if (!path) return 'default.avif';

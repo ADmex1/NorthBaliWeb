@@ -21,6 +21,7 @@ const EditDestination = () => {
     });
 
     const [images, setImages] = useState([]);
+    const [replaceImages, setReplaceImages] = useState(false);
 
     useEffect(() => {
         const fetchDestination = async () => {
@@ -68,7 +69,6 @@ const EditDestination = () => {
         try {
             const formData = new FormData();
 
-            // Split best_time_range into two values
             const [start, end] = form.best_time_range.split(" - ");
             formData.append("bestTime", `${start.trim()} - ${end.trim()}`);
 
@@ -80,7 +80,12 @@ const EditDestination = () => {
                 }
             });
 
-            images.forEach((img) => formData.append("image", img));
+            if (replaceImages) {
+                formData.append("replace_images", "true");
+                images.forEach((img) => formData.append("image", img));
+            } else {
+                formData.append("replace_images", "false");
+            }
 
             await axios.put(`http://localhost:5001/destination/update/${id}`, formData, {
                 headers: {
@@ -89,7 +94,7 @@ const EditDestination = () => {
                 },
             });
 
-            navigate("/admin");
+            navigate("/admindashboard");
         } catch (err) {
             console.error("Failed to update destination:", err);
         }
@@ -114,7 +119,14 @@ const EditDestination = () => {
                 ))}
                 <button type="button" onClick={addHighlight} className="text-blue-500 mb-2">+ Add Highlight</button>
 
-                <input type="file" multiple onChange={(e) => setImages([...e.target.files])} />
+                <label className="block mt-2">
+                    <input type="checkbox" checked={replaceImages} onChange={() => setReplaceImages(!replaceImages)} className="mr-2" />
+                    Replace existing images
+                </label>
+
+                {replaceImages && (
+                    <input type="file" multiple onChange={(e) => setImages([...e.target.files])} className="mt-2" />
+                )}
 
                 <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Update</button>
             </form>

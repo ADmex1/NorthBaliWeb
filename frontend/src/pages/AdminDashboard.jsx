@@ -25,7 +25,26 @@ const StatCard = ({ icon, title, value, color }) => (
         </div>
     </div>
 );
+const logout = async () => {
+    try {
+        await axios.post('http://localhost:5001/api/auth/logout', {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
 
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+};
+
+const confirmLogout = () => {
+    if (window.confirm("Log Out Warning: Are you sure you want to log out?")) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.reload();
+        logout();
+        navigate('/login');
+    }
+};
 const AdminDashboard = () => {
     const { token, user, loading } = useAuth();
     const [users, setUsers] = useState([]);
@@ -50,10 +69,11 @@ const AdminDashboard = () => {
                 console.error("Error fetching dashboard data:", err);
                 if (err.response?.status === 401 || err.response?.status === 403) {
                     alert("Token expired or unauthorized access");
-                    navigate('/login');
+                    await logout();
                 }
             }
         };
+
 
         if (user?.isAdmin) {
             fetchData();
@@ -88,13 +108,11 @@ const AdminDashboard = () => {
         <div className="p-4">
             <div className="flex justify-end">
                 <button
-                    onClick={() => {
-                        localStorage.removeItem('token');
-                        navigate('/login');
-                    }}
-                    className="text-red-600 flex items-center hover:underline"
+                    onClick={confirmLogout}
+                    className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center gap-2 justify-center"
                 >
-                    <LogOut className="mr-1" size={20} /> Log Out
+                    <LogOut className="w-5 h-5" />
+                    Log Out
                 </button>
             </div>
 
