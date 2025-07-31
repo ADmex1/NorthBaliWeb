@@ -92,7 +92,11 @@ const AdminDashboard = () => {
     if (!user || !user.isAdmin) {
         return <Forbidden403 />;
     }
-
+    if (!user?.isAdmin) {
+        return (
+            <Forbidden403 />
+        )
+    }
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this destination?")) return;
         try {
