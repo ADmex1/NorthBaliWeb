@@ -117,7 +117,7 @@ const CommentSection = () => {
 
       {!token || !user ? (
         <div className="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded">
-          Please log in to post a review.
+          Please <a href="/login" className="text-blue-800 underline font-semibold"> log in</a> to post a review.
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="mb-4">
