@@ -36,22 +36,16 @@ def upload_review(current_user, destination_id):
     try:
         comment = request.form.get('comment')
         rating_raw = request.form.get("rating")
-
         try:
             rating = float(rating_raw) if rating_raw is not None else 0.0
         except (TypeError, ValueError):
             return jsonify({"{!}": "Invalid rating value!"}), 400
-
         conn = get_connection()
         cursor = conn.cursor()
-
-        # Validate destination exists
         cursor.execute("SELECT * FROM destination WHERE id = %s", (destination_id,))
         destination_data = cursor.fetchone()
         if not destination_data:
             return jsonify({"{!}": "Destination not found!"}), 404
-
-        # Insert review
         cursor.execute(
             "INSERT INTO review (comment, rating, user_id, destination_id) VALUES (%s, %s, %s, %s)",
             (comment, rating, current_user['id'], destination_id)
@@ -93,40 +87,30 @@ def review_update(current_user, review_id):
         comment = request.form.get('comment')
         rating = float(request.form.get("rating", 0))
         destination_raw = request.form.get('destination_id')
-
         if not destination_raw:
             return jsonify({"{!}": "Missing destination_id!"}), 400
-
         try:
             destination_id = int(destination_raw)
         except ValueError:
             return jsonify({"{!}": "Invalid destination_id!"}), 400
-
         conn = get_connection()
         cursor = conn.cursor()
-
-        # Checks if destination exists
         cursor.execute("SELECT * FROM destination WHERE id = %s", (destination_id,))
         destination_data = cursor.fetchone()
         if not destination_data:
             return jsonify({"{!}": "Destination not found!"}), 404
-        
-        #Checks if review exists
         cursor.execute("SELECT * FROM review WHERE id = %s", (review_id,))
         review_data = cursor.fetchone()
         if not review_data:
             return jsonify({"{!}": "Review not found!"}), 404
-
         cursor.execute("SELECT * FROM review WHERE id = %s AND user_id = %s", (review_id, current_user['id']))
         user_review = cursor.fetchone()
         if not user_review:
             return jsonify({"{!}":"You have no authorization to update this review!"}),403
-        # Insert the review
         cursor.execute(
             "UPDATE review SET comment=%s, rating=%s, user_id=%s, destination_id=%s WHERE id=%s",
             (comment, rating, current_user['id'], destination_id, review_id)
         )
-
         conn.commit()
         cursor.close()
         conn.close()
@@ -141,22 +125,16 @@ def delete_review(current_user, review_id):
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-
-        # Check if review exists
         cursor.execute("SELECT * FROM review WHERE id = %s", (review_id,))
         review_data = cursor.fetchone()
         if not review_data:
             cursor.close()
             conn.close()
             return jsonify({"{!}": "Review not found!"}), 404
-
-        # Check if user is authorized to delete
         if review_data['user_id'] != current_user['id']:
             cursor.close()
             conn.close()
             return jsonify({"{!}":"You have no authorization to delete this review!"}),403
-
-        # Perform deletion
         cursor.execute("DELETE FROM review WHERE id = %s", (review_id,))
         conn.commit()
         cursor.close()

@@ -38,8 +38,7 @@ def destination_list():
                     except Exception:
                         pass 
             dest.pop('admin_id', None)
-        return jsonify(destinations), 200  # <-- Return as a plain array
-
+        return jsonify(destinations), 200  
     except mysql.connector.Error as e:
         return jsonify({"error": str(e)}), 500
     
@@ -93,8 +92,6 @@ def upload_destination(current_user):
 
         highlights_list = request.form.getlist("highlights")
         highlights_json = json.dumps(highlights_list)
-
-        # === Best Time Parsing ===
         best_time_range = best_time_range.replace("WITA", "").strip()
         try:
             best_time_start_str, best_time_end_str = [t.strip() for t in best_time_range.split(" - ")]
@@ -102,8 +99,6 @@ def upload_destination(current_user):
             best_time_end = datetime.strptime(best_time_end_str, "%H:%M").time()
         except ValueError:
             return jsonify({"error": "bestTime format must be 'HH:MM - HH:MM WITA'"}), 400
-
-        # === Image Processing ===
         image_files = request.files.getlist("image")
         if not image_files:
             return jsonify({"{-}": "The file has to be image format"}), 400
@@ -117,8 +112,6 @@ def upload_destination(current_user):
                 image_urls.append(f"/{upload_folder}/{filename}")
 
         image_json = json.dumps(image_urls)
-
-        # === Database Insert ===
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
@@ -245,14 +238,10 @@ def delete_destination(current_user, destination_id):
         destination = cursor.fetchone()
         if not destination:
             return jsonify({"{-} Error": "The Destination spot does not exist"}), 404
-
-        # Delete destination row
         cursor.execute("DELETE FROM destination WHERE id = %s", (destination_id,))
         conn.commit()
         cursor.close()
         conn.close()
-
-        # Delete image files
         image_json = destination[0]
         try:
             image_list = json.loads(image_json)

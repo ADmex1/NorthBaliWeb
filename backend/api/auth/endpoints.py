@@ -7,7 +7,6 @@ from functools import wraps
 
 auth_endpoint = Blueprint('auth', __name__)
 
-# Token Required Decorator
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -17,11 +16,7 @@ def token_required(f):
                 token = request.headers['Authorization'].split(" ")[1]
                 if not token:
                     return jsonify({"Message": "Token is missing"}), 401
-
-                # Decode token
                 data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-
-                # Fetch user from DB
                 conn = get_connection()
                 cursor = conn.cursor(dictionary=True)
                 cursor.execute("SELECT * FROM users WHERE email = %s", (data['email'],))
@@ -43,8 +38,6 @@ def token_required(f):
 
         return jsonify({"Message": "Authorization header missing!"}), 401
     return decorated
-
-# Admin Required Decorator
 def admin_required(f):
     @wraps(f)
     def decorated(current_user, *args, **kwargs):
@@ -52,8 +45,6 @@ def admin_required(f):
             return jsonify({'{!}': 'Access Denied!'}), 403
         return f(current_user, *args, **kwargs)
     return decorated
-
-# Token Generator
 def token_generate(user):
     token = jwt.encode({
         'id': user['id'],
@@ -63,8 +54,6 @@ def token_generate(user):
         'exp': datetime.datetime.utcnow() + app.config['JWT_ACCESS_TOKEN_EXPIRES']
     }, app.config['SECRET_KEY'], algorithm='HS256')
     return token
-
-# Register
 @auth_endpoint.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -74,13 +63,13 @@ def register():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Check email already exists
+
     cursor.execute("SELECT * FROM users WHERE email = %s", (data['email'],))
     if cursor.fetchone():
         return jsonify({"Error": "This email is already registered!"}), 400
     cursor.execute("SELECT COUNT(*) as user_count FROM users")
     user_count = cursor.fetchone()['user_count']
-    # Check if admin is requested
+
     is_admin = bool(data.get('is_admin', False))
 
     if is_admin:
@@ -126,8 +115,6 @@ def register():
             "is_admin": is_admin
         }
     }), 201
-
-# Login
 @auth_endpoint.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -154,8 +141,6 @@ def login():
         },
         "token": token
     }), 200
-
-# Logout
 @auth_endpoint.route('/logout', methods=['POST'])
 @token_required
 def logout(current_user):

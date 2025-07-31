@@ -67,26 +67,16 @@ def get_user(current_user):
 @token_required
 def update_password(current_user):
     data = request.get_json()
-
-    # Input validation
     if not data or not data.get('old_password') or not data.get('new_password'):
         return jsonify({"message": "Old and new passwords are required!"}), 400
-
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-
-    # Fetch hashed password from DB
     cursor.execute("SELECT password FROM users WHERE id = %s", (current_user['id'],))
     user = cursor.fetchone()
-
     if not user:
         return jsonify({"message": "User not found!"}), 404
-
-    # Compare old password with hash in DB
     if not check_password_hash(user['password'], data['old_password']):
         return jsonify({"message": "Old password is incorrect!"}), 401
-
-    # Hash new password and update
     new_hashed_password = generate_password_hash(data['new_password'])
 
     cursor.execute(
@@ -96,8 +86,6 @@ def update_password(current_user):
     conn.commit()
     cursor.close()
     conn.close()
-
-    # Invalidate session (force logout by telling frontend to delete token)
     return jsonify({
         "message": "Password updated successfully! Please log in again."
     }), 200

@@ -22,7 +22,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey')
 
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static/uploads')
 app.config['PROFILE_IMAGE_FOLDER'] = os.path.join(os.getcwd(), 'profileimage')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max file size = 16 MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'avif'}
 
 def allowed_file(filename):
