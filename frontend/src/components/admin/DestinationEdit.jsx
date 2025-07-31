@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import ForbiddenPage from "../Forbidden403";
 
 const EditDestination = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
 
+    if (!user?.isAdmin) {
+        return (
+            <ForbiddenPage />
+        );
+    }
     const [form, setForm] = useState({
         name: "",
         location: "",

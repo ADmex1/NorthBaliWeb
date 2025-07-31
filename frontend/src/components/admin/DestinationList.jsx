@@ -2,11 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import ForbiddenPage from '../Forbidden403';
 
 const DestinationList = () => {
   const [destinations, setDestinations] = useState([]);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
+  if (!user?.isAdmin) {
+    return (
+      <ForbiddenPage />
+    );
+  }
   useEffect(() => {
     axios.get('http://localhost:5001/destination-data', {
       headers: { Authorization: `Bearer ${token}` }

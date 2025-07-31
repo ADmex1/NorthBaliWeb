@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ForbiddenPage from '../Forbidden403';
 
 const DestinationCreate = () => {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const navigate = useNavigate();
-
     const [form, setForm] = useState({
         name: '',
         location: '',
@@ -20,7 +20,11 @@ const DestinationCreate = () => {
 
     const [highlights, setHighlights] = useState(['']);
     const [images, setImages] = useState([]);
-
+    if (!user?.isAdmin) {
+        return (
+            <ForbiddenPage />
+        );
+    }
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
