@@ -41,13 +41,16 @@ def update_profile(current_user):
             cursor.execute(
                 "UPDATE users SET email = %s, username = %s WHERE id = %s",
                 (email, username, current_user['id'])
-            )
-
+            ) 
         conn.commit()
+        cursor.execute("SELECT id, username, email, profile_image FROM users WHERE id = %s", (current_user['id'],))
+        updated_user = cursor.fetchone()
+       
         cursor.close()
         conn.close()
 
-        return jsonify({"Message": "Profile updated successfully!"}), 200
+        return jsonify({"Message": "Profile updated successfully!",
+                        "user": updated_user}), 200
     except Exception as e:
         return jsonify({"Error": str(e)}), 500
     
@@ -67,16 +70,26 @@ def get_user(current_user):
 @token_required
 def update_password(current_user):
     data = request.get_json()
+
+    # Input validation
     if not data or not data.get('old_password') or not data.get('new_password'):
         return jsonify({"message": "Old and new passwords are required!"}), 400
+
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
+
+    # Fetch hashed password from DB
     cursor.execute("SELECT password FROM users WHERE id = %s", (current_user['id'],))
     user = cursor.fetchone()
+
     if not user:
         return jsonify({"message": "User not found!"}), 404
+
+    # Compare old password with hash in DB
     if not check_password_hash(user['password'], data['old_password']):
         return jsonify({"message": "Old password is incorrect!"}), 401
+
+    # Hash new password and update
     new_hashed_password = generate_password_hash(data['new_password'])
 
     cursor.execute(
