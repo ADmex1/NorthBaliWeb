@@ -6,6 +6,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
 
+
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
@@ -55,11 +56,35 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
             setToken(null);
             window.location.reload();
+            // Navigate('/login');
         }
     }
+    const updateUser = (updatedData) => {
+        const newUser = { ...user, ...updatedData };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
+    };
+    const setUserServer = async () => {
+        if (!token) return;
+        try {
+            const res = await fetch('http://localhost:5001/user/me', {
+                method: `GET`,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (res.ok) {
+                const freshUser = await res.json();
+                setUser(freshUser);
+                localStorage.setItem('user', JSON.stringify(freshUser));
+            }
+        } catch (err) {
+            alert('Failed to fetch data', err);
+        }
+    };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout }}>
+        <AuthContext.Provider value={{ user, token, login, updateUser, logout, setUserServer }}>
             {children}
         </AuthContext.Provider>
     );

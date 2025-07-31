@@ -99,7 +99,7 @@ const EditDestination = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            navigate("/admindashboard");
+            navigate("/destinasi");
         } catch (err) {
             console.error("Failed to update destination:", err);
         }
