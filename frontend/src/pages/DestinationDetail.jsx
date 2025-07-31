@@ -90,12 +90,13 @@ const DestinationDetail = () => {
                 key={currentImageIndex}
                 src={
                   destination.image?.[currentImageIndex]
-                    ? `http://127.0.0.1:5001${destination.image[currentImageIndex]}`
+                    ? `http://127.0.0.1:5001/${destination.image[currentImageIndex]}?t=${Date.now()}`
                     : '/default.jpg'
                 }
                 alt={`${destination.name} ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover"
               />
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <button onClick={prevImage} className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/30 p-2 ml-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"><ChevronLeft size={30} /></button>
               <button onClick={nextImage} className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/30 p-2 mr-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"><ChevronRight size={30} /></button>

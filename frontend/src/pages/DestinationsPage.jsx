@@ -9,7 +9,7 @@ const categories = [
     "Budaya",
     "Air Terjun",
     "Kuliner",
-    // ...tambahkan kategori lain sesuai kebutuhan
+    "Snorkeling",
 ];
 
 const DestinationsPage = () => {

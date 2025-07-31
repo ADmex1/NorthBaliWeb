@@ -140,6 +140,99 @@ def upload_destination(current_user):
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
 
+# @destination_endpoints.route('/update/<int:destination_id>', methods=['PUT'])
+# @token_required
+# @admin_required
+# def update_destination(current_user, destination_id):
+#     try:
+#         data = request.form
+#         image_files = request.files.getlist("image")
+#         replace_images = data.get("replace_images", "false").lower() == "true"
+
+#         if not data.get("name"):
+#             return jsonify({"{-} Error": "name is required"}), 400
+#         conn = get_connection()
+#         cursor = conn.cursor()
+#         if replace_images:
+#             if image_files and any(img.filename for img in image_files):
+#                 image_filenames = []
+#                 for img in image_files:
+#                     if img.filename:
+#                         filename = secure_filename(img.filename)
+#                         img.save(os.path.join(upload_folder, filename))
+#                         image_filenames.append(filename)
+#                 image_urls = json.dumps(image_filenames)
+#             else:
+#                 image_urls = json.dumps([])
+#         else:
+#             cursor.execute("SELECT image FROM destination WHERE id = %s", (destination_id,))
+#             result = cursor.fetchone()
+#             image_urls = result['image'] if result else json.dumps([])
+
+#         highlights = data.getlist("highlights")
+
+#         best_time = data.get("bestTime", "")
+#         try:
+#             best_time_start, best_time_end = best_time.replace("WITA", "").strip().split(" - ")
+#         except ValueError:
+#             return jsonify({"{-} Error": "bestTime format must be 'HH:MM - HH:MM'"}), 400
+#         cursor.execute("""
+#             UPDATE destination SET
+#                 name = %s,
+#                 location = %s,
+#                 category = %s,
+#                 description = %s,
+#                 image = %s,
+#                 rating = %s,
+#                 highlights = %s,
+#                 best_time_start = %s,
+#                 best_time_end = %s,
+#                 gmaps_url = %s,
+#                 youtube_id = %s,
+#                 admin_id = %s
+#             WHERE id = %s
+#         """, (
+#             data.get("name"),
+#             data.get("location"),
+#             data.get("category"),
+#             data.get("description"),
+#             image_urls,
+#             float(data.get("rating")),
+#             json.dumps(highlights),
+#             best_time_start.strip(),
+#             best_time_end.strip(),
+#             data.get("gmapsUrl"),
+#             f"https://www.youtube.com/watch?v={data.get('youtube_id')}",
+#             current_user['id'],
+#             destination_id
+#         ))
+#         conn.commit()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT * FROM destination where id = %s", (destination_id))
+#         updated = cursor.fetchone()
+#         image_urls = updated["image"] if result else json.dumps([])
+#         cursor.close()
+#         conn.close()
+#         return jsonify({
+#         "message": "Destination updated successfully",
+#         "destination": {
+#             "id": updated.id,
+#             "name": updated.name,
+#             "location": updated.location,
+#             "category": updated.category,
+#             "description": updated.description,
+#             "image": updated.image, 
+#             "rating": updated.rating,
+#             "highlights": updated.highlights,
+#             "best_time_start": updated.best_time_start,
+#             "best_time_end": updated.best_time_end,
+#             "gmaps_url": updated.gmaps_url,
+#             "youtube_id": updated.youtube_id,
+#         }
+#     }), 200
+#     except Exception as e:
+#         return jsonify({"{-} Error": str(e)}), 500
+
 @destination_endpoints.route('/update/<int:destination_id>', methods=['PUT'])
 @token_required
 @admin_required
@@ -151,16 +244,21 @@ def update_destination(current_user, destination_id):
 
         if not data.get("name"):
             return jsonify({"{-} Error": "name is required"}), 400
+
         conn = get_connection()
         cursor = conn.cursor()
+
+        # Handle image uploading
         if replace_images:
             if image_files and any(img.filename for img in image_files):
                 image_filenames = []
                 for img in image_files:
                     if img.filename:
                         filename = secure_filename(img.filename)
-                        img.save(os.path.join(upload_folder, filename))
-                        image_filenames.append(filename)
+                        filepath = os.path.join(upload_folder, filename)
+                        img.save(filepath)
+                        # Save with path relative to static or URL base
+                        image_filenames.append(f"uploads/{filename}")
                 image_urls = json.dumps(image_filenames)
             else:
                 image_urls = json.dumps([])
@@ -169,13 +267,17 @@ def update_destination(current_user, destination_id):
             result = cursor.fetchone()
             image_urls = result['image'] if result else json.dumps([])
 
+        # Parse highlights
         highlights = data.getlist("highlights")
 
+        # Parse best time range
         best_time = data.get("bestTime", "")
         try:
             best_time_start, best_time_end = best_time.replace("WITA", "").strip().split(" - ")
         except ValueError:
             return jsonify({"{-} Error": "bestTime format must be 'HH:MM - HH:MM'"}), 400
+
+        # Update database
         cursor.execute("""
             UPDATE destination SET
                 name = %s,
@@ -197,7 +299,7 @@ def update_destination(current_user, destination_id):
             data.get("category"),
             data.get("description"),
             image_urls,
-            float(data.get("rating")),
+            float(data.get("rating", 0)),
             json.dumps(highlights),
             best_time_start.strip(),
             best_time_end.strip(),
@@ -206,16 +308,41 @@ def update_destination(current_user, destination_id):
             current_user['id'],
             destination_id
         ))
+
         conn.commit()
+
+        # Fetch updated destination
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM destination WHERE id = %s", (destination_id,))
+        updated = cursor.fetchone()
         cursor.close()
         conn.close()
-        return jsonify({"{+} Success": "Destination updated"}), 200
-    except Exception as e:
-        return jsonify({"{-} Error": str(e)}), 500
+
+        if not updated:
+            return jsonify({"{-} Error": "Destination not found"}), 404
+
+        # Return with image array parsed
+        return jsonify({
+            "message": "Destination updated successfully",
+            "destination": {
+                "id": updated["id"],
+                "name": updated["name"],
+                "location": updated["location"],
+                "category": updated["category"],
+                "description": updated["description"],
+                "image": json.loads(updated["image"]) if updated.get("image") else [],
+                "rating": updated["rating"],
+                "highlights": updated["highlights"],
+                "best_time_start": updated["best_time_start"],
+                "best_time_end": updated["best_time_end"],
+                "gmaps_url": updated["gmaps_url"],
+                "youtube_id": updated["youtube_id"],
+            }
+        }), 200
+
     except Exception as e:
         return jsonify({"{-} Error": str(e)}), 500
 
-    
 @destination_endpoints.route('/delete/<int:destination_id>', methods=['DELETE'])
 @token_required
 @admin_required

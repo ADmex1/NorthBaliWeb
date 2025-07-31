@@ -33,7 +33,7 @@ const EditDestination = () => {
         const fetchDestination = async () => {
             try {
                 const res = await axios.get(`http://localhost:5001/destination/${id}`);
-                const data = res.data.destination;
+                const data = res.data;
 
                 const bestTimeFormatted = `${data.best_time_start} - ${data.best_time_end}`;
 
@@ -99,7 +99,6 @@ const EditDestination = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-
             navigate("/admindashboard");
         } catch (err) {
             console.error("Failed to update destination:", err);
@@ -135,6 +134,7 @@ const EditDestination = () => {
                 )}
 
                 <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Update</button>
+
             </form>
         </div>
     );
